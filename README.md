@@ -1,33 +1,37 @@
 # Marketplace-de-produtos
 🛒 Stack do projeto — Marketplace de produtos usados
-Frontend
 
-React.js
-TypeScript
-Tailwind CSS
-Backend
+Frontend:
+  -React.js
+  -TypeScript
+  -Tailwind CSS
+  -Backend
 
-Node.js
-TypeScript
-Express.js
-Banco de dados
+Backend:
+  -Node.js
+  -TypeScript
+  -Express.js
+  -Banco de dados
 
-PostgreSQL
-Arquitetura
+Base de dados:
+-PostgreSQL
 
-Frontend separado do Backend
-Comunicação via API REST
-PostgreSQL como banco relacional
-Principais funcionalidades
 
-Cadastro/login de usuários
-Cadastro e gerenciamento de anúncios
-Upload de fotos
-Categorias e filtros
-Busca por produtos
-Filtro por localização
-Favoritos
-Perfil do vendedor
+Arquitetura:
+
+  Frontend separado do Backend
+  Comunicação via API REST
+  PostgreSQL como banco relacional
+  Principais funcionalidades
+  
+  Cadastro/login de usuários
+  Cadastro e gerenciamento de anúncios
+  Upload de fotos
+  Categorias e filtros
+  Busca por produtos
+  Filtro por localização
+  Favoritos
+  Perfil do vendedor
 Chat/comunicação entre comprador e vendedor
 Avaliação de vendedores/produtos
 Painel administrativo
