@@ -1,6 +1,7 @@
 <div align="center">
 
 # 🛒 Marketplace de Produtos Usados
+# Digital Trading and Selling (DTS)
 
 Plataforma web para compra e venda de produtos usados, permitindo que usuários publiquem anúncios, encontrem produtos próximos e entrem em contato com vendedores.
 
