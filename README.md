@@ -1,37 +1,58 @@
-# Marketplace-de-produtos
-🛒 Stack do projeto — Marketplace de produtos usados
+<div align="center">
 
-Frontend:
-  -React.js
-  -TypeScript
-  -Tailwind CSS
-  -Backend
+# 🛒 Marketplace de Produtos Usados
 
-Backend:
-  -Node.js
-  -TypeScript
-  -Express.js
-  -Banco de dados
+Plataforma web para compra e venda de produtos usados, permitindo que usuários publiquem anúncios, encontrem produtos próximos e entrem em contato com vendedores.
 
-Base de dados:
--PostgreSQL
+</div>
 
+---
 
-Arquitetura:
+## 🚀 Tecnologias
 
-  Frontend separado do Backend
-  Comunicação via API REST
-  PostgreSQL como banco relacional
-  Principais funcionalidades
-  
-  Cadastro/login de usuários
-  Cadastro e gerenciamento de anúncios
-  Upload de fotos
-  Categorias e filtros
-  Busca por produtos
-  Filtro por localização
-  Favoritos
-  Perfil do vendedor
-Chat/comunicação entre comprador e vendedor
-Avaliação de vendedores/produtos
-Painel administrativo
+### 🎨 Frontend
+
+- **React.js**
+- **TypeScript**
+- **Tailwind CSS**
+
+### ⚙️ Backend
+
+- **Node.js**
+- **TypeScript**
+- **Express.js**
+
+### 🗄️ Banco de Dados
+
+- **PostgreSQL**
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto utiliza uma arquitetura com **Frontend e Backend separados**, comunicando-se através de uma **API REST**.
+
+```text
+┌──────────────────────┐
+│      Frontend        │
+│                      │
+│ React + TypeScript   │
+│      + Tailwind      │
+└──────────┬───────────┘
+           │
+           │ API REST
+           ▼
+┌──────────────────────┐
+│       Backend        │
+│                      │
+│ Node.js + Express    │
+│      + TypeScript    │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│     PostgreSQL       │
+│                      │
+│   Banco de Dados     │
+│     Relacional       │
+└──────────────────────┘
