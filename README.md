@@ -8,37 +8,43 @@ O projeto tem como objetivo desenvolver uma plataforma web na qual usuários pos
 
 ---
 
-## 📌 Status do projeto
+## 📌 Status
 
 🚧 **Em desenvolvimento**
 
-Atualmente, o projeto está na fase de configuração da estrutura inicial e desenvolvimento da API.
+O projeto encontra-se em fase inicial de desenvolvimento.
 
 ---
 
-# 🧰 Tecnologias
+# 🧰 Stack
 
 ## Frontend
 
-- **React.js** — construção da interface
-- **TypeScript** — tipagem estática
-- **Tailwind CSS** — estilização e desenvolvimento da interface
+- React.js
+- TypeScript
+- Tailwind CSS
 
 ## Backend
 
-- **Node.js** — ambiente de execução JavaScript
-- **TypeScript** — tipagem estática
-- **Express.js** — criação da API REST
+- Node.js
+- TypeScript
+- Express.js
 
-## Banco de dados
+## Banco de Dados
 
-- **PostgreSQL** — banco de dados relacional
+- PostgreSQL
+
+## Ferramentas
+
+- Git
+- GitHub
+- npm
 
 ---
 
 # 🏗️ Arquitetura
 
-O projeto será dividido em duas aplicações principais:
+O projeto é dividido em duas aplicações:
 
 ```text
 DTS-Marketplace/
@@ -53,69 +59,61 @@ DTS-Marketplace/
 └── README.md
 ```
 
-O frontend e o backend serão executados separadamente e irão se comunicar através de uma **API REST**.
+O frontend e o backend funcionam separadamente e se comunicam através de uma **API REST**.
 
 ```text
-┌─────────────────────────────┐
-│          FRONTEND           │
-│                             │
-│ React + TypeScript          │
-│ Tailwind CSS                │
-└──────────────┬──────────────┘
-               │
-               │ HTTP / REST
-               ▼
-┌─────────────────────────────┐
-│           BACKEND           │
-│                             │
-│ Node.js + Express           │
-│ TypeScript                  │
-└──────────────┬──────────────┘
-               │
-               │ SQL
-               ▼
-┌─────────────────────────────┐
-│         PostgreSQL          │
-│                             │
-│     Banco de dados          │
-│        relacional           │
-└─────────────────────────────┘
+┌──────────────────────────┐
+│        FRONTEND          │
+│                          │
+│ React + TypeScript       │
+│ Tailwind CSS             │
+└────────────┬─────────────┘
+             │
+             │ HTTP / REST
+             ▼
+┌──────────────────────────┐
+│         BACKEND          │
+│                          │
+│ Node.js + Express        │
+│ TypeScript               │
+└────────────┬─────────────┘
+             │
+             │ SQL
+             ▼
+┌──────────────────────────┐
+│       PostgreSQL         │
+│                          │
+│    Banco Relacional      │
+└──────────────────────────┘
 ```
 
 ---
 
 # 💻 Pré-requisitos
 
-Antes de executar o projeto, é necessário instalar:
+Antes de começar, instale:
 
-- [Node.js](https://nodejs.org/)
-- npm — instalado junto com o Node.js
-- PostgreSQL
+- Node.js
+- npm
 - Git
+- PostgreSQL
 
-Para verificar a instalação do Node.js:
+Verifique se estão instalados:
 
 ```bash
 node --version
-```
-
-Para verificar o npm:
-
-```bash
 npm --version
-```
-
-Para verificar o Git:
-
-```bash
 git --version
+psql --version
 ```
 
 ---
 
-# 📥 Clonando o projeto
+# 📥 Configuração para colaboradores
 
-Clone o repositório:
+## 1. Clone o repositório
+
+Escolha uma pasta onde deseja armazenar o projeto e execute:
 
 ```bash
 git clone URL_DO_REPOSITORIO
@@ -131,7 +129,7 @@ cd DTS-Marketplace
 
 # ⚙️ Configuração do Backend
 
-Entre na pasta do backend:
+Entre na pasta:
 
 ```bash
 cd backend
@@ -143,38 +141,37 @@ Instale as dependências:
 npm install
 ```
 
-O backend utiliza:
-
-- Node.js
-- Express
-- TypeScript
-- TSX
+O `npm install` utiliza o `package.json` e o `package-lock.json` para instalar as dependências necessárias.
 
 ---
 
-## 📦 Dependências principais
+## 🔐 Configuração das variáveis de ambiente
 
-### Express
+O projeto utiliza variáveis de ambiente para armazenar configurações que não devem ser diretamente incluídas no código.
 
-O Express é utilizado para facilitar a criação da API HTTP.
+Dentro da pasta `backend`, crie:
+
+```text
+.env
+```
+
+Utilize o arquivo `.env.example` como referência.
 
 Exemplo:
 
-```typescript
-app.get("/", (req, res) => {
-  res.json({
-    message: "API do Marketplace funcionando!"
-  });
-});
+```env
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=dts_marketplace
+DB_USER=postgres
+DB_PASSWORD=
 ```
 
-### TypeScript
+> ⚠️ O arquivo `.env` não deve ser enviado para o GitHub.
 
-O TypeScript adiciona tipagem estática ao JavaScript e ajuda a identificar erros durante o desenvolvimento.
-
-### TSX
-
-O `tsx` permite executar arquivos TypeScript diretamente durante o desenvolvimento.
+O `.env.example` deve ser mantido no repositório para servir como modelo para os colaboradores.
 
 ---
 
@@ -186,41 +183,244 @@ Dentro da pasta `backend`:
 npm run dev
 ```
 
-O comando utiliza o script definido no `package.json`:
-
-```json
-{
-  "scripts": {
-    "dev": "tsx watch src/server.ts"
-  }
-}
-```
-
-O `watch` faz com que o servidor seja reiniciado automaticamente quando os arquivos forem modificados.
-
-Após iniciar, a API estará disponível em:
+O servidor será iniciado utilizando:
 
 ```text
 http://localhost:3000
 ```
 
+Durante o desenvolvimento, o `tsx watch` reinicia automaticamente o servidor quando os arquivos forem alterados.
+
 ---
 
-# 📁 Estrutura inicial do Backend
+# 🎨 Configuração do Frontend
 
-```text
-backend/
-│
-├── src/
-│   └── server.ts
-│
-├── node_modules/
-├── package.json
-├── package-lock.json
-└── tsconfig.json
+Abra outro terminal.
+
+A partir da raiz do projeto:
+
+```bash
+cd frontend
 ```
 
-Conforme o projeto crescer, a estrutura será organizada em módulos:
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Execute o projeto:
+
+```bash
+npm run dev
+```
+
+O endereço será exibido no terminal.
+
+Normalmente:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# 🗄️ Banco de Dados
+
+O projeto utiliza PostgreSQL.
+
+Cada colaborador deverá possuir uma instalação local do PostgreSQL para desenvolvimento.
+
+Banco inicialmente esperado:
+
+```text
+Nome: dts_marketplace
+Porta: 5432
+Usuário: postgres
+```
+
+As configurações devem ser informadas no arquivo `.env`.
+
+> A estrutura definitiva do banco será definida durante a etapa de modelagem.
+
+---
+
+# 🌿 Fluxo de desenvolvimento com Git
+
+Não trabalhe diretamente na branch `main`.
+
+Para desenvolver uma nova funcionalidade, crie uma branch:
+
+```bash
+git checkout -b feature/nome-da-funcionalidade
+```
+
+Exemplos:
+
+```bash
+git checkout -b feature/login
+git checkout -b feature/products
+git checkout -b feature/search
+```
+
+Depois de implementar a funcionalidade:
+
+```bash
+git add .
+```
+
+Crie um commit:
+
+```bash
+git commit -m "feat: adiciona cadastro de produtos"
+```
+
+Envie a branch para o GitHub:
+
+```bash
+git push -u origin feature/nome-da-funcionalidade
+```
+
+Depois, abra um **Pull Request** para a branch `main`.
+
+---
+
+# 🔄 Antes de começar uma nova tarefa
+
+Sempre atualize sua cópia local do projeto:
+
+```bash
+git checkout main
+git pull origin main
+```
+
+Depois crie sua nova branch:
+
+```bash
+git checkout -b feature/nome-da-funcionalidade
+```
+
+---
+
+# 📝 Convenção de branches
+
+Utilizaremos os seguintes padrões:
+
+```text
+feature/    → nova funcionalidade
+fix/        → correção de problema
+refactor/   → alteração estrutural
+docs/       → documentação
+test/       → testes
+chore/      → manutenção/configuração
+```
+
+Exemplos:
+
+```text
+feature/user-login
+feature/product-crud
+feature/search-filter
+fix/login-validation
+docs/api-documentation
+test/product-service
+```
+
+---
+
+# 📝 Convenção de commits
+
+Os commits devem utilizar uma descrição curta e objetiva.
+
+### Tipos
+
+```text
+feat:      nova funcionalidade
+fix:       correção de problema
+refactor:  alteração estrutural
+docs:      documentação
+test:      testes
+style:     formatação
+chore:     configuração/manutenção
+```
+
+### Exemplos
+
+```bash
+git commit -m "feat: adiciona cadastro de usuários"
+
+git commit -m "feat: cria endpoint de produtos"
+
+git commit -m "fix: corrige validação de preço"
+
+git commit -m "docs: atualiza instruções de instalação"
+
+git commit -m "chore: configura TypeScript"
+```
+
+---
+
+# 🔀 Pull Requests
+
+Antes de abrir um Pull Request:
+
+1. Verifique se o código funciona.
+2. Verifique se não existem erros no console.
+3. Verifique se os arquivos desnecessários não estão sendo enviados.
+4. Atualize a documentação caso necessário.
+5. Faça commits organizados.
+6. Atualize sua branch com a `main`, caso necessário.
+
+O Pull Request deve explicar brevemente:
+
+- O que foi implementado?
+- Qual problema foi resolvido?
+- Como testar?
+- Existe alguma alteração importante?
+
+---
+
+# 🚫 Arquivos que não devem ser enviados
+
+Nunca faça commit de:
+
+```text
+node_modules/
+.env
+dist/
+build/
+*.log
+```
+
+O `.gitignore` do projeto já está configurado para ignorar esses arquivos.
+
+---
+
+# 📁 Estrutura do projeto
+
+Estrutura inicial:
+
+```text
+DTS-Marketplace/
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+│
+├── backend/
+│   ├── src/
+│   │   └── server.ts
+│   ├── package.json
+│   ├── package-lock.json
+│   └── tsconfig.json
+│
+├── .gitignore
+└── README.md
+```
+
+Conforme o backend evoluir:
 
 ```text
 backend/
@@ -239,178 +439,58 @@ backend/
 └── tsconfig.json
 ```
 
-### Responsabilidade das pastas
-
-| Pasta | Responsabilidade |
-|---|---|
-| `controllers/` | Receber requisições e retornar respostas |
-| `routes/` | Definir as rotas da API |
-| `services/` | Concentrar regras de negócio |
-| `models/` | Representar entidades e dados |
-| `middlewares/` | Processamentos intermediários |
-| `database/` | Configurações e acesso ao banco |
-| `server.ts` | Inicialização do servidor |
-
----
-
-# 📝 TypeScript
-
-O projeto utiliza o arquivo:
-
-```text
-tsconfig.json
-```
-
-Esse arquivo define as configurações utilizadas pelo TypeScript.
-
-Exemplo de configuração:
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  },
-  "include": ["src"]
-}
-```
-
-O projeto utiliza **ES Modules**, permitindo utilizar:
-
-```typescript
-import express from "express";
-```
-
-Por isso o `package.json` possui:
-
-```json
-{
-  "type": "module"
-}
-```
-
----
-
-# 🗄️ Banco de Dados
-
-O banco utilizado pelo projeto será o **PostgreSQL**.
-
-A aplicação terá entidades relacionadas a:
-
-```text
-Usuários
-    │
-    ├── Anúncios
-    │      ├── Fotos
-    │      ├── Categoria
-    │      └── Localização
-    │
-    ├── Favoritos
-    │
-    ├── Conversas
-    │      └── Mensagens
-    │
-    └── Avaliações
-```
-
-A estrutura definitiva do banco será definida durante a etapa de modelagem.
-
----
-
-# 🔐 Variáveis de ambiente
-
-Informações sensíveis não devem ser armazenadas diretamente no código ou enviadas para o GitHub.
-
-Será utilizado um arquivo:
-
-```text
-.env
-```
-
-Exemplo:
-
-```env
-PORT=3000
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=dts_marketplace
-DB_USER=postgres
-DB_PASSWORD=sua_senha
-```
-
-> ⚠️ Nunca envie o arquivo `.env` para o GitHub.
-
-O `.gitignore` deve conter:
-
-```gitignore
-node_modules/
-.env
-.env.*
-dist/
-*.log
-```
-
 ---
 
 # 🛍️ Funcionalidades planejadas
 
 ## 👤 Usuários
 
-- Cadastro
-- Login
-- Autenticação
-- Perfil do usuário
-- Perfil do vendedor
+- [ ] Cadastro
+- [ ] Login
+- [ ] Autenticação
+- [ ] Perfil do usuário
+- [ ] Perfil do vendedor
 
-## 🏷️ Produtos e anúncios
+## 🏷️ Produtos
 
-- Criar anúncio
-- Editar anúncio
-- Excluir anúncio
-- Visualizar anúncio
-- Adicionar fotos
-- Definir preço
-- Adicionar descrição
-- Selecionar categoria
-- Informar localização
-- Alterar status do anúncio
+- [ ] Criar anúncio
+- [ ] Editar anúncio
+- [ ] Excluir anúncio
+- [ ] Visualizar anúncio
+- [ ] Adicionar fotos
+- [ ] Definir preço
+- [ ] Adicionar descrição
+- [ ] Selecionar categoria
+- [ ] Informar localização
 
 ## 🔎 Busca
 
-- Buscar produtos
-- Filtrar por categoria
-- Filtrar por preço
-- Filtrar por localização
-- Ordenar resultados
+- [ ] Buscar produtos
+- [ ] Filtrar por categoria
+- [ ] Filtrar por preço
+- [ ] Filtrar por localização
+- [ ] Ordenar resultados
 
 ## ❤️ Interações
 
-- Favoritar produtos
-- Entrar em contato com vendedor
-- Chat entre usuários
-- Avaliar vendedor
-- Avaliar produto
+- [ ] Favoritar produtos
+- [ ] Chat entre usuários
+- [ ] Avaliar vendedor
+- [ ] Avaliar produto
 
 ## 🛡️ Administração
 
-- Painel administrativo
-- Gerenciamento de usuários
-- Gerenciamento de anúncios
-- Gerenciamento de categorias
-- Moderação de conteúdo
+- [ ] Painel administrativo
+- [ ] Gerenciar usuários
+- [ ] Gerenciar anúncios
+- [ ] Gerenciar categorias
+- [ ] Moderar conteúdo
 
 ---
 
-# 🌐 API REST
+# 🌐 API
 
-O backend será responsável por disponibilizar uma API REST para o frontend.
+O backend disponibilizará uma API REST.
 
 Exemplos de endpoints planejados:
 
@@ -433,162 +513,74 @@ DELETE /favorites/:id
 
 GET    /conversations
 POST   /conversations
+
 GET    /messages
 POST   /messages
 ```
 
-Os endpoints ainda poderão ser modificados conforme a definição dos requisitos e da modelagem do sistema.
-
----
-
-# 🔄 Fluxo básico
-
-Um fluxo esperado para o usuário será:
-
-```text
-Usuário
-   │
-   ▼
-Cadastro / Login
-   │
-   ▼
-Página inicial
-   │
-   ├───────────────┐
-   ▼               ▼
-Pesquisar       Publicar
-produtos        produto
-   │               │
-   ▼               ▼
-Filtros          Anúncio
-   │
-   ▼
-Produto
-   │
-   ├── Favoritar
-   │
-   └── Contatar vendedor
-```
-
----
-
-# 🧪 Desenvolvimento
-
-Durante o desenvolvimento, recomenda-se trabalhar com branches:
-
-```text
-main
-│
-├── feature/login
-├── feature/products
-├── feature/search
-└── feature/chat
-```
-
-Exemplo:
-
-```bash
-git checkout -b feature/products
-```
-
-Após concluir uma funcionalidade:
-
-```bash
-git add .
-git commit -m "feat: adiciona cadastro de produtos"
-git push origin feature/products
-```
-
----
-
-# 📋 Convenção de commits
-
-Recomenda-se utilizar commits seguindo um padrão simples:
-
-```text
-feat: nova funcionalidade
-
-fix: correção de erro
-
-refactor: alteração estrutural
-
-docs: documentação
-
-style: alterações de formatação
-
-test: criação ou alteração de testes
-
-chore: configuração ou manutenção
-```
-
-Exemplos:
-
-```text
-feat: adiciona cadastro de usuários
-feat: cria endpoint de produtos
-fix: corrige validação de preço
-docs: atualiza README
-```
+> Os endpoints ainda poderão sofrer alterações durante o desenvolvimento.
 
 ---
 
 # 👥 Equipe
 
-Adicione os integrantes do projeto:
-
-- Nome — Responsabilidade
-- Nome — Responsabilidade
-- Nome — Responsabilidade
-- Nome — Responsabilidade
+| Integrante | Responsabilidade |
+|---|---|
+| Nome | Frontend |
+| Nome | Backend |
+| Nome | Banco de Dados |
+| Nome | Documentação |
 
 ---
 
 # 🎓 Objetivos acadêmicos
 
-O projeto busca aplicar conhecimentos relacionados a:
+O projeto busca aplicar conhecimentos de:
 
 - Engenharia de Software
 - Desenvolvimento Web
-- Arquitetura Cliente-Servidor
 - APIs REST
 - Banco de Dados
 - Modelagem Relacional
+- Arquitetura Cliente-Servidor
+- Git e GitHub
 - Desenvolvimento Frontend
 - Desenvolvimento Backend
-- Autenticação e autorização
+- Autenticação
 - CRUD
-- Requisitos de software
-- Versionamento com Git
 - Trabalho colaborativo
 
 ---
 
 # 📌 Roadmap
 
-- [x] Configuração inicial do repositório
-- [x] Definição da stack
-- [x] Configuração inicial do Backend
-- [ ] Configuração do Frontend
-- [ ] Configuração do PostgreSQL
-- [ ] Modelagem do banco
-- [ ] Sistema de usuários
-- [ ] Sistema de autenticação
-- [ ] CRUD de produtos
-- [ ] Sistema de categorias
-- [ ] Busca e filtros
-- [ ] Localização
-- [ ] Favoritos
-- [ ] Chat
-- [ ] Avaliações
-- [ ] Painel administrativo
-- [ ] Testes
-- [ ] Documentação final
+- [x] Criar repositório
+- [x] Definir stack
+- [x] Configurar Backend
+- [x] Configurar TypeScript
+- [x] Configurar Express
+- [ ] Configurar Frontend
+- [ ] Configurar PostgreSQL
+- [ ] Modelar banco de dados
+- [ ] Implementar usuários
+- [ ] Implementar autenticação
+- [ ] Implementar CRUD de produtos
+- [ ] Implementar categorias
+- [ ] Implementar busca
+- [ ] Implementar filtros
+- [ ] Implementar localização
+- [ ] Implementar favoritos
+- [ ] Implementar chat
+- [ ] Implementar avaliações
+- [ ] Implementar painel administrativo
+- [ ] Realizar testes
+- [ ] Finalizar documentação
 
 ---
 
 <div align="center">
 
-### 🛒 DTS Marketplace
+## 🛒 DTS Marketplace
 
 Projeto acadêmico de marketplace de produtos usados.
 
