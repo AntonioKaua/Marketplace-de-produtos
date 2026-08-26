@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import {
   Search, ShoppingCart, User, Menu, X, ChevronRight, Heart, Star,
   Truck, ShieldCheck, CreditCard, ArrowRight, LogOut, Package,
   LayoutDashboard, Store, MapPin, CheckCircle2
 } from "lucide-react";
+import {
+  getCurrentUserRequest,
+  loginRequest,
+  logoutRequest,
+  registerUserRequest,
+} from "./services/api";
 
 const products = [
   { id: 1, name: "Notebook Lenovo IdeaPad 3", price: 2499.9, old: 2899.9, category: "Informática", rating: 4.8, seller: "DTS Store", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80" },
@@ -146,16 +152,106 @@ function Home({ onAdd }) {
   </main>;
 }
 
-function Login({ onLogin }) {
-  const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [error,setError]=useState("");
-  const submit=e=>{e.preventDefault(); if(!email||!password){setError("Informe e-mail e senha.");return;} onLogin({name:email.split("@")[0],email});};
-  return <AuthShell title="Entre na sua conta" subtitle="Acesse seus pedidos, favoritos e compras."><form onSubmit={submit} className="space-y-5"><Field label="E-mail"><input className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com"/></Field><Field label="Senha"><input className="input" type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••"/></Field>{error&&<p className="text-sm font-medium text-red-600">{error}</p>}<div className="text-right"><Link to="/forgot-password" className="text-sm font-semibold text-dts-600">Esqueceu sua senha?</Link></div><button className="btn-primary w-full">Entrar</button><p className="text-center text-sm text-slate-500">Ainda não possui conta? <Link className="font-bold text-dts-600" to="/register">Criar conta</Link></p></form></AuthShell>;
+function Login({ onAuthenticated }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const submit = async event => {
+    event.preventDefault();
+    setError("");
+
+    if (!email.trim() || !password) {
+      setError("Informe e-mail e senha.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await loginRequest(email, password);
+      onAuthenticated(response.user);
+
+      const requestedPath = new URLSearchParams(location.search).get("next");
+      const destination = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
+        ? requestedPath
+        : "/account";
+
+      navigate(destination, { replace: true });
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return <AuthShell title="Entre na sua conta" subtitle="Acesse seus pedidos, favoritos e compras."><form onSubmit={submit} className="space-y-5"><Field label="E-mail"><input className="input" type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com" disabled={loading}/></Field><Field label="Senha"><input className="input" type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" disabled={loading}/></Field>{error&&<p role="alert" className="text-sm font-medium text-red-600">{error}</p>}<div className="text-right"><Link to="/forgot-password" className="text-sm font-semibold text-dts-600">Esqueceu sua senha?</Link></div><button className="btn-primary w-full" disabled={loading}>{loading ? "Entrando..." : "Entrar"}</button><p className="text-center text-sm text-slate-500">Ainda não possui conta? <Link className="font-bold text-dts-600" to="/register">Criar conta</Link></p></form></AuthShell>;
 }
 
-function Register({ onLogin }) {
-  const [data,setData]=useState({name:"",email:"",password:"",confirm:""}); const [error,setError]=useState("");
-  const submit=e=>{e.preventDefault(); if(!data.name||!data.email||!data.password){setError("Preencha todos os campos.");return;} if(data.password!==data.confirm){setError("As senhas não conferem.");return;} onLogin({name:data.name,email:data.email});};
-  return <AuthShell title="Crie sua conta" subtitle="Cadastre-se para comprar e vender na DTS."><form onSubmit={submit} className="space-y-4"><Field label="Nome"><input className="input" value={data.name} onChange={e=>setData({...data,name:e.target.value})}/></Field><Field label="E-mail"><input className="input" type="email" value={data.email} onChange={e=>setData({...data,email:e.target.value})}/></Field><Field label="Senha"><input className="input" type="password" value={data.password} onChange={e=>setData({...data,password:e.target.value})}/></Field><Field label="Confirmar senha"><input className="input" type="password" value={data.confirm} onChange={e=>setData({...data,confirm:e.target.value})}/></Field>{error&&<p className="text-sm text-red-600">{error}</p>}<button className="btn-primary w-full">Criar minha conta</button><p className="text-center text-sm text-slate-500">Já possui conta? <Link className="font-bold text-dts-600" to="/login">Entrar</Link></p></form></AuthShell>;
+function Register({ onAuthenticated }) {
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    cpf: "",
+    password: "",
+    confirm: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const change = event => {
+    setData(current => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  const submit = async event => {
+    event.preventDefault();
+    setError("");
+
+    if (!data.name.trim() || !data.email.trim() || !data.phone.trim() || !data.cpf.trim() || !data.password) {
+      setError("Preencha todos os campos.");
+      return;
+    }
+
+    if (data.password.length < 6) {
+      setError("A senha deve possuir pelo menos 6 caracteres.");
+      return;
+    }
+
+    if (data.password !== data.confirm) {
+      setError("As senhas não conferem.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await registerUserRequest({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        cpf: data.cpf,
+        password: data.password,
+      });
+
+      const loginResponse = await loginRequest(data.email, data.password);
+      onAuthenticated(loginResponse.user);
+      navigate("/account", { replace: true });
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return <AuthShell title="Crie sua conta" subtitle="Cadastre-se para comprar e vender na DTS."><form onSubmit={submit} className="space-y-4"><Field label="Nome"><input className="input" name="name" autoComplete="name" value={data.name} onChange={change} disabled={loading}/></Field><Field label="E-mail"><input className="input" name="email" type="email" autoComplete="email" value={data.email} onChange={change} disabled={loading}/></Field><Field label="Telefone"><input className="input" name="phone" inputMode="tel" autoComplete="tel" value={data.phone} onChange={change} placeholder="85999999999" disabled={loading}/></Field><Field label="CPF"><input className="input" name="cpf" inputMode="numeric" value={data.cpf} onChange={change} placeholder="Somente números" disabled={loading}/></Field><Field label="Senha"><input className="input" name="password" type="password" autoComplete="new-password" value={data.password} onChange={change} disabled={loading}/></Field><Field label="Confirmar senha"><input className="input" name="confirm" type="password" autoComplete="new-password" value={data.confirm} onChange={change} disabled={loading}/></Field>{error&&<p role="alert" className="text-sm text-red-600">{error}</p>}<button className="btn-primary w-full" disabled={loading}>{loading ? "Criando conta..." : "Criar minha conta"}</button><p className="text-center text-sm text-slate-500">Já possui conta? <Link className="font-bold text-dts-600" to="/login">Entrar</Link></p></form></AuthShell>;
 }
 
 function AuthShell({title,subtitle,children}) { return <main className="min-h-[calc(100vh-132px)] bg-slate-50 py-12"><div className="mx-auto max-w-md px-4"><div className="mb-7 text-center"><Link to="/" className="text-3xl font-black text-dts-600">DTS</Link><h1 className="mt-6 text-2xl font-black">{title}</h1><p className="mt-2 text-sm text-slate-500">{subtitle}</p></div><div className="card p-6 sm:p-8">{children}</div></div></main>; }
@@ -189,18 +285,52 @@ function Seller() { return <main className="container-dts py-10"><div className=
 function Placeholder({title}) { return <main className="container-dts py-16"><div className="card p-10 text-center"><LayoutDashboard className="mx-auto text-dts-600" size={42}/><h1 className="mt-5 text-2xl font-black">{title}</h1><p className="mx-auto mt-2 max-w-lg text-slate-500">Tela estruturada e pronta para receber os dados da API DTS.</p></div></main>; }
 
 export default function App() {
-  const [user,setUser]=useState(()=>JSON.parse(localStorage.getItem("dts_user")||"null"));
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [cart,setCart]=useState([]);
+
+  useEffect(() => {
+    let active = true;
+
+    getCurrentUserRequest()
+      .then(response => {
+        if (active) setUser(response.user);
+      })
+      .catch(error => {
+        if (active && error.status !== 401) {
+          console.error("Erro ao restaurar a sessão:", error);
+        }
+      })
+      .finally(() => {
+        if (active) setAuthLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const add=p=>setCart(c=>{const found=c.find(x=>x.id===p.id);return found?c.map(x=>x.id===p.id?{...x,qty:x.qty+1}:x):[...c,{...p,qty:1}];});
   const remove=id=>setCart(c=>c.filter(x=>x.id!==id));
   const qty=(id,d)=>setCart(c=>c.map(x=>x.id===id?{...x,qty:Math.max(1,x.qty+d)}:x));
-  const login=u=>{localStorage.setItem("dts_user",JSON.stringify(u));setUser(u);};
-  const logout=()=>{localStorage.removeItem("dts_user");setUser(null);};
+  const logout = async () => {
+    try {
+      await logoutRequest();
+    } catch (error) {
+      console.error("Erro ao encerrar sessão:", error);
+    } finally {
+      setUser(null);
+    }
+  };
+
+  if (authLoading) {
+    return <main className="flex min-h-screen items-center justify-center bg-slate-50"><p className="font-semibold text-slate-500">Carregando sua sessão...</p></main>;
+  }
 
   return <div className="min-h-screen bg-slate-50"><Header user={user} onLogout={logout} cartCount={cart.reduce((s,x)=>s+x.qty,0)}/><Routes>
     <Route path="/" element={<Home onAdd={add}/>}/>
-    <Route path="/login" element={<Login onLogin={login}/>}/>
-    <Route path="/register" element={<Register onLogin={login}/>}/>
+    <Route path="/login" element={<Login onAuthenticated={setUser}/>}/>
+    <Route path="/register" element={<Register onAuthenticated={setUser}/>}/>
     <Route path="/forgot-password" element={<AuthShell title="Recuperar senha" subtitle="Informe seu e-mail para receber as instruções."><form className="space-y-5"><Field label="E-mail"><input className="input" type="email" placeholder="seu@email.com"/></Field><button className="btn-primary w-full">Enviar instruções</button></form></AuthShell>}/>
     <Route path="/search" element={<SearchPage onAdd={add}/>}/>
     <Route path="/categories/:category" element={<SearchPage onAdd={add}/>}/>
