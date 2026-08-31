@@ -16,11 +16,36 @@ export interface UserCredentials {
   password: string;
 }
 
+interface UserCredentialsRow extends Omit<UserCredentials, "id"> {
+  id_user: number;
+}
+
+interface PublicUserRow {
+  id_user: number;
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export async function findUserByEmail(email: string) {
   const { data, error } = await supabase
     .from("users")
     .select("id_user")
     .eq("email", email)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function findUserByCpf(cpf: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id_user")
+    .eq("cpf", cpf)
     .maybeSingle();
 
   if (error) {
@@ -41,7 +66,17 @@ export async function findUserCredentialsByEmail(email: string) {
     throw new Error(error.message);
   }
 
-  return data as UserCredentials | null;
+  const row = data as UserCredentialsRow | null;
+
+  return row
+    ? {
+        id: row.id_user,
+        name: row.name,
+        email: row.email,
+        phone: row.phone,
+        password: row.password,
+      }
+    : null;
 }
 
 export async function findPublicUserById(id: number) {
@@ -55,7 +90,16 @@ export async function findPublicUserById(id: number) {
     throw new Error(error.message);
   }
 
-  return data;
+  const row = data as PublicUserRow | null;
+
+  return row
+    ? {
+        id: row.id_user,
+        name: row.name,
+        email: row.email,
+        phone: row.phone,
+      }
+    : null;
 }
 
 export async function createUser(data: CreateUserData) {
@@ -75,5 +119,12 @@ export async function createUser(data: CreateUserData) {
     throw new Error(error.message);
   }
 
-  return user;
+  return {
+    id: user.id_user,
+    name: user.name,
+    cpf: user.cpf,
+    email: user.email,
+    phone: user.phone,
+    creationDate: user.creation_date,
+  };
 }

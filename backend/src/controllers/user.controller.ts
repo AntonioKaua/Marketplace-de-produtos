@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 
 import {
   createUser,
+  findUserByCpf,
   findUserByEmail,
   findUserCredentialsByEmail,
   findPublicUserById,
@@ -12,6 +13,7 @@ import {
   ACCESS_TOKEN_MAX_AGE,
   createAccessToken,
 } from "../services/token.service.js";
+import { validateRegistrationInput } from "../utils/user-validation.js";
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -29,52 +31,48 @@ function authCookieOptions() {
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const {
-      name,
-      email,
-      phone,
-      cpf,
-      password,
-    } = req.body;
+    const input = req.body && typeof req.body === "object" ? req.body : {};
+    const { data, errors } = validateRegistrationInput(input);
 
-    if (
-      !isNonEmptyString(name) ||
-      !isNonEmptyString(email) ||
-      !isNonEmptyString(phone) ||
-      !isNonEmptyString(cpf) ||
-      !isNonEmptyString(password)
-    ) {
-      return res.status(400).json({
+    if (Object.keys(errors).length > 0) {
+      return res.status(422).json({
         success: false,
-        message: "Nome, email, telefone, CPF e senha são obrigatórios.",
+        message: "Verifique os dados informados.",
+        errors,
       });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "A senha deve possuir pelo menos 6 caracteres.",
-      });
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-
-    const existingUser = await findUserByEmail(normalizedEmail);
+    const existingUser = await findUserByEmail(data.email);
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
         message: "Este email já está cadastrado.",
+        errors: {
+          email: "Este email já está cadastrado.",
+        },
       });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const existingCpf = await findUserByCpf(data.cpf);
+
+    if (existingCpf) {
+      return res.status(409).json({
+        success: false,
+        message: "Este CPF já está cadastrado.",
+        errors: {
+          cpf: "Este CPF já está cadastrado.",
+        },
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user = await createUser({
-      name: name.trim(),
-      email: normalizedEmail,
-      phone: phone.trim(),
-      cpf: cpf.trim(),
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      cpf: data.cpf,
       password: passwordHash,
     });
 

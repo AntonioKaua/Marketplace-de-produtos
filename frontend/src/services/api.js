@@ -1,10 +1,11 @@
 const API_PREFIX = "/api";
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, errors = {}) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.errors = errors;
   }
 }
 
@@ -33,6 +34,7 @@ async function apiRequest(path, { body, ...options } = {}) {
     throw new ApiError(
       payload.message || "Não foi possível concluir a solicitação.",
       response.status,
+      payload.errors,
     );
   }
 

@@ -11,6 +11,10 @@ import {
   logoutRequest,
   registerUserRequest,
 } from "./services/api";
+import {
+  onlyDigits,
+  validateRegistrationForm,
+} from "./utils/userValidation";
 
 const products = [
   { id: 1, name: "Notebook Lenovo IdeaPad 3", price: 2499.9, old: 2899.9, category: "Informática", rating: 4.8, seller: "DTS Store", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80" },
@@ -59,10 +63,12 @@ function Header({ cartCount = 0, user, onLogout }) {
               <button className="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-slate-100">
                 <User size={20}/><span className="max-w-24 truncate text-sm font-semibold">{user.name}</span>
               </button>
-              <div className="invisible absolute right-0 mt-1 w-56 rounded-2xl border bg-white p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
-                <Link className="flex gap-2 rounded-xl px-3 py-2 hover:bg-slate-50" to="/account">Minha conta</Link>
-                <Link className="flex gap-2 rounded-xl px-3 py-2 hover:bg-slate-50" to="/account/orders">Meus pedidos</Link>
-                <button onClick={onLogout} className="flex w-full gap-2 rounded-xl px-3 py-2 text-left text-red-600 hover:bg-red-50"><LogOut size={18}/>Sair</button>
+              <div className="invisible absolute right-0 top-full z-50 w-56 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <div className="rounded-2xl border bg-white p-2 shadow-xl">
+                  <Link className="flex gap-2 rounded-xl px-3 py-2 hover:bg-slate-50" to="/account">Minha conta</Link>
+                  <Link className="flex gap-2 rounded-xl px-3 py-2 hover:bg-slate-50" to="/account/orders">Meus pedidos</Link>
+                  <button onClick={onLogout} className="flex w-full gap-2 rounded-xl px-3 py-2 text-left text-red-600 hover:bg-red-50"><LogOut size={18}/>Sair</button>
+                </div>
               </div>
             </div>
           ) : <Link to="/login" className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100 sm:flex"><User size={20}/>Entrar</Link>}
@@ -201,35 +207,36 @@ function Register({ onAuthenticated }) {
     confirm: "",
   });
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const change = event => {
+    const { name } = event.target;
+    const value = ["phone", "cpf"].includes(name)
+      ? onlyDigits(event.target.value).slice(0, 11)
+      : event.target.value;
+
     setData(current => ({
       ...current,
-      [event.target.name]: event.target.value,
+      [name]: value,
     }));
+    setFieldErrors(current => ({ ...current, [name]: undefined }));
+    setError("");
   };
 
   const submit = async event => {
     event.preventDefault();
     setError("");
 
-    if (!data.name.trim() || !data.email.trim() || !data.phone.trim() || !data.cpf.trim() || !data.password) {
-      setError("Preencha todos os campos.");
+    const validationErrors = validateRegistrationForm(data);
+    if (Object.keys(validationErrors).length) {
+      setFieldErrors(validationErrors);
+      setError("Corrija os campos destacados antes de continuar.");
       return;
     }
 
-    if (data.password.length < 6) {
-      setError("A senha deve possuir pelo menos 6 caracteres.");
-      return;
-    }
-
-    if (data.password !== data.confirm) {
-      setError("As senhas não conferem.");
-      return;
-    }
-
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -245,17 +252,20 @@ function Register({ onAuthenticated }) {
       onAuthenticated(loginResponse.user);
       navigate("/account", { replace: true });
     } catch (requestError) {
+      setFieldErrors(requestError.errors || {});
       setError(requestError.message);
     } finally {
       setLoading(false);
     }
   };
 
-  return <AuthShell title="Crie sua conta" subtitle="Cadastre-se para comprar e vender na DTS."><form onSubmit={submit} className="space-y-4"><Field label="Nome"><input className="input" name="name" autoComplete="name" value={data.name} onChange={change} disabled={loading}/></Field><Field label="E-mail"><input className="input" name="email" type="email" autoComplete="email" value={data.email} onChange={change} disabled={loading}/></Field><Field label="Telefone"><input className="input" name="phone" inputMode="tel" autoComplete="tel" value={data.phone} onChange={change} placeholder="85999999999" disabled={loading}/></Field><Field label="CPF"><input className="input" name="cpf" inputMode="numeric" value={data.cpf} onChange={change} placeholder="Somente números" disabled={loading}/></Field><Field label="Senha"><input className="input" name="password" type="password" autoComplete="new-password" value={data.password} onChange={change} disabled={loading}/></Field><Field label="Confirmar senha"><input className="input" name="confirm" type="password" autoComplete="new-password" value={data.confirm} onChange={change} disabled={loading}/></Field>{error&&<p role="alert" className="text-sm text-red-600">{error}</p>}<button className="btn-primary w-full" disabled={loading}>{loading ? "Criando conta..." : "Criar minha conta"}</button><p className="text-center text-sm text-slate-500">Já possui conta? <Link className="font-bold text-dts-600" to="/login">Entrar</Link></p></form></AuthShell>;
+  const inputClass = field => `input ${fieldErrors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-200" : ""}`;
+
+  return <AuthShell title="Crie sua conta" subtitle="Cadastre-se para comprar e vender na DTS."><form onSubmit={submit} className="space-y-4" noValidate><Field label="Nome" error={fieldErrors.name}><input className={inputClass("name")} name="name" autoComplete="name" maxLength={100} value={data.name} onChange={change} aria-invalid={Boolean(fieldErrors.name)} disabled={loading}/></Field><Field label="E-mail" error={fieldErrors.email}><input className={inputClass("email")} name="email" type="email" autoComplete="email" maxLength={254} value={data.email} onChange={change} aria-invalid={Boolean(fieldErrors.email)} disabled={loading}/></Field><Field label="Telefone" error={fieldErrors.phone}><input className={inputClass("phone")} name="phone" inputMode="numeric" autoComplete="tel" maxLength={11} value={data.phone} onChange={change} aria-invalid={Boolean(fieldErrors.phone)} placeholder="85999999999" disabled={loading}/></Field><Field label="CPF" error={fieldErrors.cpf}><input className={inputClass("cpf")} name="cpf" inputMode="numeric" maxLength={11} value={data.cpf} onChange={change} aria-invalid={Boolean(fieldErrors.cpf)} placeholder="Somente números" disabled={loading}/></Field><Field label="Senha" error={fieldErrors.password}><input className={inputClass("password")} name="password" type="password" autoComplete="new-password" maxLength={72} value={data.password} onChange={change} aria-invalid={Boolean(fieldErrors.password)} disabled={loading}/></Field><Field label="Confirmar senha" error={fieldErrors.confirm}><input className={inputClass("confirm")} name="confirm" type="password" autoComplete="new-password" maxLength={72} value={data.confirm} onChange={change} aria-invalid={Boolean(fieldErrors.confirm)} disabled={loading}/></Field>{error&&<p role="alert" className="text-sm text-red-600">{error}</p>}<button className="btn-primary w-full" disabled={loading}>{loading ? "Criando conta..." : "Criar minha conta"}</button><p className="text-center text-sm text-slate-500">Já possui conta? <Link className="font-bold text-dts-600" to="/login">Entrar</Link></p></form></AuthShell>;
 }
 
 function AuthShell({title,subtitle,children}) { return <main className="min-h-[calc(100vh-132px)] bg-slate-50 py-12"><div className="mx-auto max-w-md px-4"><div className="mb-7 text-center"><Link to="/" className="text-3xl font-black text-dts-600">DTS</Link><h1 className="mt-6 text-2xl font-black">{title}</h1><p className="mt-2 text-sm text-slate-500">{subtitle}</p></div><div className="card p-6 sm:p-8">{children}</div></div></main>; }
-function Field({label,children}) { return <label className="block"><span className="mb-2 block text-sm font-semibold">{label}</span>{children}</label>; }
+function Field({label,error,children}) { return <label className="block"><span className="mb-2 block text-sm font-semibold">{label}</span>{children}{error&&<span role="alert" className="mt-1.5 block text-sm font-medium text-red-600">{error}</span>}</label>; }
 
 function SearchPage({onAdd}) {
   const [term,setTerm]=useState(new URLSearchParams(useLocation().search).get("q")||"");
