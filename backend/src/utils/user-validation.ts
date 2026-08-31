@@ -38,7 +38,7 @@ export function isValidCpf(value: string) {
     calculateDigit(9) === Number(cpf[9]) &&
     calculateDigit(10) === Number(cpf[10])
   );
-}
+}//para testes apagar este validador
 
 export function validateRegistrationInput(input: Record<string, unknown>) {
   const name = typeof input.name === "string" ? input.name.trim() : "";
