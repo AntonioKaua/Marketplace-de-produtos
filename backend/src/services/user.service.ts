@@ -19,7 +19,7 @@ export interface UserCredentials {
 export async function findUserByEmail(email: string) {
   const { data, error } = await supabase
     .from("users")
-    .select("id")
+    .select("id_user")
     .eq("email", email)
     .maybeSingle();
 
@@ -33,7 +33,7 @@ export async function findUserByEmail(email: string) {
 export async function findUserCredentialsByEmail(email: string) {
   const { data, error } = await supabase
     .from("users")
-    .select("id, name, email, phone, password")
+    .select("id_user, name, email, phone, password")
     .eq("email", email)
     .maybeSingle();
 
@@ -47,8 +47,8 @@ export async function findUserCredentialsByEmail(email: string) {
 export async function findPublicUserById(id: number) {
   const { data, error } = await supabase
     .from("users")
-    .select("id, name, email, phone")
-    .eq("id", id)
+    .select("id_user, name, email, phone")
+    .eq("id_user", id)
     .maybeSingle();
 
   if (error) {
@@ -68,7 +68,7 @@ export async function createUser(data: CreateUserData) {
       phone: data.phone,
       password: data.password,
     })
-    .select("id, name, cpf, email, phone, creation_date")
+    .select("id_user, name, cpf, email, phone, creation_date")
     .single();
 
   if (error) {
