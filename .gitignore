@@ -8,10 +8,15 @@ node_modules/
 # Variaveis de ambiente e credenciais
 # ==========================================
 
+# Nunca versionar variáveis de ambiente e segredos, mesmo em subpastas.
 .env
 .env.*
+**/.env
+**/.env.*
 !.env.example
 !.env.*.example
+!**/.env.example
+!**/.env.*.example
 
 .npmrc
 .yarnrc
