@@ -71,11 +71,7 @@ export async function findUserByCpf(cpf: string) {
 export async function findUserCredentialsByEmail(email: string) {
   const { data, error } = await supabase
     .from("users")
-<<<<<<< HEAD
     .select("id_user, name, email, phone, password, role")
-=======
-    .select("id_user, name, email, phone, password")
->>>>>>> main
     .eq("email", email)
     .maybeSingle();
 
@@ -92,10 +88,7 @@ export async function findUserCredentialsByEmail(email: string) {
         email: row.email,
         phone: row.phone,
         password: row.password,
-<<<<<<< HEAD
         role: row.role,
-=======
->>>>>>> main
       }
     : null;
 }
@@ -103,11 +96,7 @@ export async function findUserCredentialsByEmail(email: string) {
 export async function findPublicUserById(id: number) {
   const { data, error } = await supabase
     .from("users")
-<<<<<<< HEAD
     .select("id_user, name, email, phone, role")
-=======
-    .select("id_user, name, email, phone")
->>>>>>> main
     .eq("id_user", id)
     .maybeSingle();
 
@@ -123,7 +112,6 @@ export async function findPublicUserById(id: number) {
         name: row.name,
         email: row.email,
         phone: row.phone,
-<<<<<<< HEAD
         role: row.role,
       }
     : null;
@@ -155,10 +143,6 @@ export async function updateUserProfile(
     phone: user.phone,
     role: user.role,
   };
-=======
-      }
-    : null;
->>>>>>> main
 }
 
 export async function createUser(data: CreateUserData) {
