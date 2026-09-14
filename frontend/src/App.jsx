@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
+import ChatbaseWidget from "./components/ChatbaseWidget";
 import Header from "./components/Header";
 import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
@@ -88,6 +89,7 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
+      <ChatbaseWidget />
     </div>
   );
 }

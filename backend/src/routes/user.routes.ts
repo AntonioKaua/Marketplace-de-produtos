@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { createChatbotIdentityToken } from "../controllers/chatbot.controller.js";
 import {
   getCurrentUser,
   loginUser,
@@ -14,6 +15,7 @@ const router = Router();
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.get("/me", requireAuth, getCurrentUser);
+router.get("/chatbot-token", requireAuth, createChatbotIdentityToken);
 router.patch("/me", requireAuth, updateProfile);
 router.post("/", registerUser);
 

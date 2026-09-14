@@ -60,6 +60,10 @@ export function getCurrentUserRequest() {
   return apiRequest("/users/me");
 }
 
+export function getChatbotIdentityTokenRequest() {
+  return apiRequest("/users/chatbot-token");
+}
+
 export function updateProfileRequest(data) {
   return apiRequest("/users/me", {
     method: "PATCH",
