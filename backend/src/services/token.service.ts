@@ -1,5 +1,6 @@
 import { jwtVerify, SignJWT } from "jose";
 
+// Metadados que vinculam o token a esta API e ao frontend autorizado.
 const TOKEN_ISSUER = "marketplace-api";
 const TOKEN_AUDIENCE = "marketplace-frontend";
 const TOKEN_EXPIRATION = "1h";
@@ -13,6 +14,7 @@ interface AccessTokenPayload {
   role: string;
 }
 
+// Lê a chave de assinatura e impede usar segredo ausente ou fraco.
 function getJwtSecret() {
   const jwtSecret = process.env.JWT_SECRET;
 
@@ -25,6 +27,7 @@ function getJwtSecret() {
   return new TextEncoder().encode(jwtSecret);
 }
 
+// Gera o JWT de sessão. O id vai em "sub" e os demais dados viram claims.
 export async function createAccessToken({
   userId,
   email,
@@ -40,6 +43,7 @@ export async function createAccessToken({
     .sign(getJwtSecret());
 }
 
+// Verifica assinatura, emissor, público, expiração e formato mínimo do token.
 export async function verifyAccessToken(token: string) {
   const { payload } = await jwtVerify(token, getJwtSecret(), {
     issuer: TOKEN_ISSUER,

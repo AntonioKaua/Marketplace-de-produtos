@@ -8,6 +8,7 @@ import {
 } from "../controllers/conversation.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
+// Conversas e mensagens sempre dependem da identidade do participante logado.
 const router = Router();
 
 router.use(requireAuth);

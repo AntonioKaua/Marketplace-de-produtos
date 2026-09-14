@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { getOrderById, isOrderParticipant } from "../services/order.service.js";
 import { getPaymentStatusForOrder, processPaymentNotification } from "../services/payment.service.js";
 
+// Valida a assinatura HMAC enviada pelo Mercado Pago quando o segredo de webhook existe.
 function isSignatureValid(req: Request, dataId: string) {
   const secret = process.env.MP_WEBHOOK_SECRET;
 
@@ -38,12 +39,14 @@ function isSignatureValid(req: Request, dataId: string) {
   return expected === v1;
 }
 
+// Endpoint chamado pelo Mercado Pago para sincronizar o status de um pagamento.
 export async function postWebhook(req: Request, res: Response) {
   try {
     const body = req.body ?? {};
     const type = body.type ?? req.query.type ?? req.query.topic;
     const dataId = body.data?.id ?? req.query["data.id"] ?? req.query.id;
 
+    // Outros tipos de evento não afetam pedidos e são confirmados sem processamento.
     if (type !== "payment" || !dataId) {
       return res.status(200).json({ success: true });
     }
@@ -62,6 +65,7 @@ export async function postWebhook(req: Request, res: Response) {
   }
 }
 
+// Permite que participantes do pedido consultem o status que chegou pelo webhook.
 export async function getOrderPaymentStatus(req: Request, res: Response) {
   try {
     const orderId = Number(req.params.orderId);

@@ -4,6 +4,7 @@ import { listReviewsHandler, postReviewHandler } from "../controllers/review.con
 import { getSeller } from "../controllers/seller.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
+// Perfil e avaliações são públicos; registrar avaliação requer sessão.
 const router = Router();
 
 router.get("/:id", getSeller);

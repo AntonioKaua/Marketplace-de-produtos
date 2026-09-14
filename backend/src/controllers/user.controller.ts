@@ -19,10 +19,12 @@ import {
   validateRegistrationInput,
 } from "../utils/user-validation.js";
 
+// Garante que campos obrigatórios recebidos da requisição são textos não vazios.
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+// Centraliza as proteções do cookie de sessão para login e logout usarem as mesmas opções.
 function authCookieOptions() {
   return {
     httpOnly: true,
@@ -33,6 +35,7 @@ function authCookieOptions() {
   };
 }
 
+// Valida, normaliza e cria um usuário. Email e CPF são conferidos antes do hash da senha.
 export async function registerUser(req: Request, res: Response) {
   try {
     const input = req.body && typeof req.body === "object" ? req.body : {};
@@ -46,6 +49,7 @@ export async function registerUser(req: Request, res: Response) {
       });
     }
 
+    // Evita duplicidade de identificadores antes de inserir no banco.
     const existingUser = await findUserByEmail(data.email);
 
     if (existingUser) {
@@ -70,6 +74,7 @@ export async function registerUser(req: Request, res: Response) {
       });
     }
 
+    // Nunca salva senha pura: bcrypt produz o hash que será comparado no login.
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user = await createUser({
@@ -96,6 +101,7 @@ export async function registerUser(req: Request, res: Response) {
   }
 }
 
+// Confere credenciais, gera um JWT e o entrega apenas no cookie httpOnly.
 export async function loginUser(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
@@ -110,6 +116,7 @@ export async function loginUser(req: Request, res: Response) {
     const normalizedEmail = email.trim().toLowerCase();
     const user = await findUserCredentialsByEmail(normalizedEmail);
 
+    // bcrypt.compare calcula a comparação sem revelar se email ou senha falhou.
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({
         success: false,
@@ -147,6 +154,7 @@ export async function loginUser(req: Request, res: Response) {
   }
 }
 
+// Recarrega os dados públicos da conta usando o id extraído do JWT.
 export async function getCurrentUser(_req: Request, res: Response) {
   try {
     const user = await findPublicUserById(res.locals.auth.userId);
@@ -174,6 +182,7 @@ export async function getCurrentUser(_req: Request, res: Response) {
   }
 }
 
+// Atualiza apenas os campos de perfil permitidos para o próprio usuário autenticado.
 export async function updateProfile(req: Request, res: Response) {
   try {
     const input = req.body && typeof req.body === "object" ? req.body : {};
@@ -204,6 +213,7 @@ export async function updateProfile(req: Request, res: Response) {
   }
 }
 
+// Apaga o cookie de sessão; o token deixa de ser enviado nas próximas requisições.
 export function logoutUser(_req: Request, res: Response) {
   res.clearCookie(ACCESS_TOKEN_COOKIE, authCookieOptions());
 

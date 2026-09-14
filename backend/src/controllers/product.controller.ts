@@ -15,6 +15,8 @@ import {
 const CONDITIONS = ["novo", "usado"];
 const MAX_IMAGES_PER_PRODUCT = 8;
 
+// Converte o corpo recebido em dados de produto confiáveis e reúne erros por campo.
+// "partial" é true na edição, quando os campos podem chegar separadamente.
 function parseProductInput(body: unknown, partial: boolean) {
   const input = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
   const errors: Record<string, string> = {};
@@ -22,6 +24,7 @@ function parseProductInput(body: unknown, partial: boolean) {
   const has = (key: string) => Object.prototype.hasOwnProperty.call(input, key);
   const data: Partial<ProductData> = {};
 
+  // Cada bloco valida um campo somente quando ele é obrigatório ou foi enviado.
   if (!partial || has("title")) {
     const title = typeof input.title === "string" ? input.title.trim() : "";
     if (title.length < 3 || title.length > 150) {
@@ -97,6 +100,7 @@ function parseProductInput(body: unknown, partial: boolean) {
   return { data, errors };
 }
 
+// Lista anúncios ativos aplicando busca, categoria, faixa de preço e paginação.
 export async function getProducts(req: Request, res: Response) {
   try {
     const { q, categoryId, minPrice, maxPrice, page, limit } = req.query;
@@ -117,6 +121,7 @@ export async function getProducts(req: Request, res: Response) {
   }
 }
 
+// Lista todos os anúncios do usuário logado, inclusive os não ativos.
 export async function getMyProducts(req: Request, res: Response) {
   try {
     const result = await listProducts({
@@ -132,6 +137,7 @@ export async function getMyProducts(req: Request, res: Response) {
   }
 }
 
+// Busca um anúncio público e anexa a média das avaliações.
 export async function getProduct(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -155,6 +161,7 @@ export async function getProduct(req: Request, res: Response) {
   }
 }
 
+// Cria anúncio associando automaticamente o vendedor ao usuário da sessão.
 export async function postProduct(req: Request, res: Response) {
   try {
     const { data, errors } = parseProductInput(req.body, false);
@@ -171,6 +178,7 @@ export async function postProduct(req: Request, res: Response) {
   }
 }
 
+// Regra de autorização reutilizada: somente dono do anúncio ou admin pode alterá-lo.
 async function assertOwnerOrAdmin(req: Request, res: Response, productId: number) {
   const ownerId = await findProductOwner(productId);
 
@@ -187,6 +195,7 @@ async function assertOwnerOrAdmin(req: Request, res: Response, productId: number
   return true;
 }
 
+// Atualiza somente os campos enviados após confirmar a permissão do usuário.
 export async function putProduct(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -211,6 +220,7 @@ export async function putProduct(req: Request, res: Response) {
   }
 }
 
+// Exclui um anúncio apenas quando a regra de propriedade for satisfeita.
 export async function removeProduct(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -229,6 +239,7 @@ export async function removeProduct(req: Request, res: Response) {
   }
 }
 
+// Faz upload das imagens recebidas, respeitando o limite total por anúncio.
 export async function postProductImages(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -245,6 +256,7 @@ export async function postProductImages(req: Request, res: Response) {
       return res.status(400).json({ success: false, message: "Envie ao menos uma imagem." });
     }
 
+    // Soma as imagens já existentes para impedir que vários uploads ultrapassem o máximo.
     const existingCount = await countProductImages(id);
 
     if (existingCount + files.length > MAX_IMAGES_PER_PRODUCT) {
@@ -266,6 +278,7 @@ export async function postProductImages(req: Request, res: Response) {
   }
 }
 
+// Remove uma imagem específica do Storage e do registro do anúncio.
 export async function removeProductImage(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

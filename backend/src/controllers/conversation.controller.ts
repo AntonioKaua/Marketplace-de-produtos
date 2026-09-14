@@ -7,6 +7,7 @@ import {
 } from "../services/conversation.service.js";
 import { createMessage, listMessages } from "../services/message.service.js";
 
+// Verifica se a conversa existe e se o usuário da sessão é comprador ou vendedor dela.
 async function assertParticipant(res: Response, conversationId: number) {
   const conversation = await getConversationById(conversationId);
 
@@ -25,6 +26,7 @@ async function assertParticipant(res: Response, conversationId: number) {
   return conversation;
 }
 
+// Abre ou reaproveita uma conversa entre comprador e vendedor sobre um produto.
 export async function postConversation(req: Request, res: Response) {
   try {
     const sellerId = Number(req.body?.sellerId);
@@ -48,6 +50,7 @@ export async function postConversation(req: Request, res: Response) {
   }
 }
 
+// Lista somente as conversas das quais o usuário logado participa.
 export async function getConversations(_req: Request, res: Response) {
   try {
     const conversations = await listConversations(res.locals.auth.userId);
@@ -58,6 +61,7 @@ export async function getConversations(_req: Request, res: Response) {
   }
 }
 
+// Lista mensagens após confirmar que a pessoa pode acessar a conversa.
 export async function getMessages(req: Request, res: Response) {
   try {
     const conversationId = Number(req.params.id);
@@ -76,6 +80,7 @@ export async function getMessages(req: Request, res: Response) {
   }
 }
 
+// Valida e grava uma nova mensagem na conversa autorizada.
 export async function postMessage(req: Request, res: Response) {
   try {
     const conversationId = Number(req.params.id);

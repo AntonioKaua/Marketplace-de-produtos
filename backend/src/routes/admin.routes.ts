@@ -10,6 +10,7 @@ import {
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireAdmin } from "../middlewares/role.middleware.js";
 
+// O painel administrativo só pode ser alcançado com sessão válida e role admin.
 const router = Router();
 
 router.use(requireAuth, requireAdmin);

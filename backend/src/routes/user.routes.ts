@@ -8,6 +8,7 @@ import {
 } from "../controllers/user.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
+// Rotas abertas: cadastro, login e logout. Rotas com requireAuth exigem sessão.
 const router = Router();
 
 router.post("/login", loginUser);

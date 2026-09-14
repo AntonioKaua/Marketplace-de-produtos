@@ -7,7 +7,7 @@ import { listCategoriesRequest } from "../services/categories";
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const { count } = useCart();
+  const { count, clear } = useCart();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [categories, setCategories] = useState([]);

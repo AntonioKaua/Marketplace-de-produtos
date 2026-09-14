@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { addFavorite, isFavorite, listFavorites, removeFavorite } from "../services/favorite.service.js";
 
+// Lista os produtos favoritados pelo usuário da sessão.
 export async function getFavorites(_req: Request, res: Response) {
   try {
     const favorites = await listFavorites(res.locals.auth.userId);
@@ -12,6 +13,7 @@ export async function getFavorites(_req: Request, res: Response) {
   }
 }
 
+// Informa se um produto específico já foi favoritado pela pessoa logada.
 export async function getFavoriteStatus(req: Request, res: Response) {
   try {
     const productId = Number(req.params.productId);
@@ -28,6 +30,7 @@ export async function getFavoriteStatus(req: Request, res: Response) {
   }
 }
 
+// Cria a relação entre o usuário da sessão e o produto escolhido.
 export async function postFavorite(req: Request, res: Response) {
   try {
     const productId = Number(req.params.productId);
@@ -44,6 +47,7 @@ export async function postFavorite(req: Request, res: Response) {
   }
 }
 
+// Remove apenas o favorito pertencente ao usuário da sessão.
 export async function deleteFavorite(req: Request, res: Response) {
   try {
     const productId = Number(req.params.productId);

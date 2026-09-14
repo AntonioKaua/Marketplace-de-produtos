@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { getAverageRating, listReviews, ReviewTarget, upsertReview } from "../services/review.service.js";
 
+// Aceita nota inteira de 1 a 5 e comentário opcional com tamanho limitado.
 function parseReviewInput(body: unknown) {
   const input = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
   const rating = Number(input.rating);
@@ -15,6 +16,7 @@ function parseReviewInput(body: unknown) {
   return { data: { rating, comment: comment || null }, errors };
 }
 
+// Cria um handler reutilizável para avaliações de produtos e de vendedores.
 export function listReviewsHandler(target: ReviewTarget) {
   return async (req: Request, res: Response) => {
     try {
@@ -24,6 +26,7 @@ export function listReviewsHandler(target: ReviewTarget) {
         return res.status(400).json({ success: false, message: "Identificador inválido." });
       }
 
+      // As duas consultas independentes executam em paralelo para responder mais rápido.
       const [reviews, rating] = await Promise.all([
         listReviews(target, targetId),
         getAverageRating(target, targetId),
@@ -37,6 +40,7 @@ export function listReviewsHandler(target: ReviewTarget) {
   };
 }
 
+// Cria um handler reutilizável para registrar ou atualizar uma avaliação.
 export function postReviewHandler(target: ReviewTarget) {
   return async (req: Request, res: Response) => {
     try {

@@ -9,6 +9,7 @@ import {
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { requireAdmin } from "../middlewares/role.middleware.js";
 
+// Categorias são públicas para leitura; alterações são exclusivas de administradores.
 const router = Router();
 
 router.get("/", getCategories);

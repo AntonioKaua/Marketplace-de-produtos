@@ -12,10 +12,12 @@ export type RegistrationErrors = Partial<Record<RegistrationField, string>>;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[1-9]{2}(?:[2-5]\d{7}|9\d{8})$/;
 
+// Remove máscara de CPF/telefone antes de validar ou persistir no banco.
 export function onlyDigits(value: string) {
   return value.replace(/\D/g, "");
 }
 
+// Valida tamanho, sequências repetidas e os dois dígitos verificadores do CPF.
 export function isValidCpf(value: string) {
   const cpf = onlyDigits(value);
 
@@ -23,6 +25,7 @@ export function isValidCpf(value: string) {
     return false;
   }
 
+  // Aplica o cálculo oficial do CPF para o primeiro e o segundo dígito.
   const calculateDigit = (length: number) => {
     let sum = 0;
 
@@ -40,6 +43,7 @@ export function isValidCpf(value: string) {
   );
 }//para testes apagar este validador
 
+// Normaliza os dados do cadastro e devolve erros separados por campo para a interface.
 export function validateRegistrationInput(input: Record<string, unknown>) {
   const name = typeof input.name === "string" ? input.name.trim() : "";
   const email = typeof input.email === "string"
@@ -87,6 +91,7 @@ export interface ProfileUpdateData {
   phone: string;
 }
 
+// Versão reduzida da validação para edição do perfil, que não altera email, CPF ou senha.
 export function validateProfileUpdateInput(input: Record<string, unknown>) {
   const name = typeof input.name === "string" ? input.name.trim() : "";
   const phone = typeof input.phone === "string" ? onlyDigits(input.phone) : "";

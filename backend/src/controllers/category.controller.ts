@@ -7,6 +7,7 @@ import {
   updateCategory,
 } from "../services/category.service.js";
 
+// Normaliza e valida os dados usados ao criar ou editar uma categoria.
 function parseCategoryInput(body: unknown) {
   const input = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
   const name = typeof input.name === "string" ? input.name.trim() : "";
@@ -29,6 +30,7 @@ function parseCategoryInput(body: unknown) {
   return { data: { name, description, parentId }, errors };
 }
 
+// Retorna categorias para navegação e formulários de anúncio.
 export async function getCategories(_req: Request, res: Response) {
   try {
     const categories = await listCategories();
@@ -42,6 +44,7 @@ export async function getCategories(_req: Request, res: Response) {
   }
 }
 
+// Cria uma categoria depois de validar nome e categoria pai opcional.
 export async function postCategory(req: Request, res: Response) {
   try {
     const { data, errors } = parseCategoryInput(req.body);
@@ -61,6 +64,7 @@ export async function postCategory(req: Request, res: Response) {
   }
 }
 
+// Atualiza uma categoria existente identificada pelo parâmetro da URL.
 export async function putCategory(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -91,6 +95,7 @@ export async function putCategory(req: Request, res: Response) {
   }
 }
 
+// Exclui uma categoria identificada pelo parâmetro da URL.
 export async function removeCategory(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

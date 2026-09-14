@@ -12,6 +12,7 @@ import {
 } from "../services/order.service.js";
 import { createPreferenceForOrder } from "../services/payment.service.js";
 
+// Valida itens e endereço antes de o service reservar estoque e gravar o pedido.
 function parseOrderInput(body: unknown) {
   const input = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
   const errors: Record<string, string> = {};
@@ -58,6 +59,7 @@ function parseOrderInput(body: unknown) {
   return { data: { items, shipping }, errors };
 }
 
+// Cria o pedido e, em seguida, gera a preferência/link de pagamento do Mercado Pago.
 export async function postOrder(req: Request, res: Response) {
   try {
     const { data, errors } = parseOrderInput(req.body);
@@ -66,6 +68,7 @@ export async function postOrder(req: Request, res: Response) {
       return res.status(422).json({ success: false, message: "Verifique os dados informados.", errors });
     }
 
+    // O service recalcula preço e estoque no servidor; nada é confiado ao carrinho do frontend.
     const order = await createOrder(res.locals.auth.userId, data.items, data.shipping);
     const fullOrder = await getOrderById(order.id);
 
@@ -85,6 +88,7 @@ export async function postOrder(req: Request, res: Response) {
   }
 }
 
+// Gera um novo link de pagamento apenas para o comprador de um pedido pendente.
 export async function postOrderCheckout(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -115,6 +119,7 @@ export async function postOrderCheckout(req: Request, res: Response) {
   }
 }
 
+// Retorna o histórico de compras do usuário da sessão.
 export async function getMyOrders(_req: Request, res: Response) {
   try {
     const orders = await listOrdersByBuyer(res.locals.auth.userId);
@@ -125,6 +130,7 @@ export async function getMyOrders(_req: Request, res: Response) {
   }
 }
 
+// Retorna os itens vendidos pelo usuário da sessão.
 export async function getSellingOrders(_req: Request, res: Response) {
   try {
     const orders = await listOrdersBySeller(res.locals.auth.userId);
@@ -135,6 +141,7 @@ export async function getSellingOrders(_req: Request, res: Response) {
   }
 }
 
+// Exibe detalhes somente ao comprador, a um vendedor participante ou a um admin.
 export async function getOrder(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

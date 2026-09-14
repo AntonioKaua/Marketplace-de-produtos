@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { getAverageRating } from "../services/review.service.js";
 import { getSellerProfile } from "../services/seller.service.js";
 
+// Busca dados públicos do vendedor e calcula sua reputação.
 export async function getSeller(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

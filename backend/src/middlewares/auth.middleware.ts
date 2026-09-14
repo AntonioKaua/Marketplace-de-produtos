@@ -5,6 +5,8 @@ import {
   verifyAccessToken,
 } from "../services/token.service.js";
 
+// Protege rotas privadas: lê o JWT do cookie, valida a assinatura e disponibiliza
+// userId, email e role em res.locals.auth para o próximo middleware/controlador.
 export async function requireAuth(
   req: Request,
   res: Response,
@@ -12,6 +14,7 @@ export async function requireAuth(
 ) {
   const token = req.cookies?.[ACCESS_TOKEN_COOKIE];
 
+  // Sem cookie não existe sessão para validar.
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -20,6 +23,7 @@ export async function requireAuth(
   }
 
   try {
+    // Só prossegue para a rota se o token estiver válido e não expirado.
     res.locals.auth = await verifyAccessToken(token);
     return next();
   } catch {

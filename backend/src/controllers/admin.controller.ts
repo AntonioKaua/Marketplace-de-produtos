@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { deleteUser, listAllUsers, updateUserRole } from "../services/admin.service.js";
 import { deleteProduct, listProducts } from "../services/product.service.js";
 
+// Lista dados públicos de usuários para a gestão administrativa.
 export async function getUsers(_req: Request, res: Response) {
   try {
     const users = await listAllUsers();
@@ -13,6 +14,7 @@ export async function getUsers(_req: Request, res: Response) {
   }
 }
 
+// Promove ou rebaixa um usuário, impedindo que o admin remova seu próprio acesso.
 export async function patchUserRole(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -43,6 +45,7 @@ export async function patchUserRole(req: Request, res: Response) {
   }
 }
 
+// Remove um usuário escolhido pelo admin, exceto a própria conta da sessão.
 export async function removeUser(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
@@ -63,6 +66,7 @@ export async function removeUser(req: Request, res: Response) {
   }
 }
 
+// Lista anúncios de qualquer status para ações de moderação.
 export async function getAdminProducts(_req: Request, res: Response) {
   try {
     const result = await listProducts({ onlyActive: false, limit: 60 });
@@ -73,6 +77,7 @@ export async function getAdminProducts(_req: Request, res: Response) {
   }
 }
 
+// Permite ao admin remover um anúncio, independentemente de quem o criou.
 export async function removeAdminProduct(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

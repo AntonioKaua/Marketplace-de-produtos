@@ -14,6 +14,7 @@ import {
 import { listReviewsHandler, postReviewHandler } from "../controllers/review.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
+// Configura o upload em memória: até 8 imagens e 5 MB por arquivo.
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 8 },
@@ -26,6 +27,7 @@ const upload = multer({
   },
 });
 
+// Consulta de anúncios é pública; criação, edição, exclusão e imagens exigem login.
 const router = Router();
 
 router.get("/", getProducts);

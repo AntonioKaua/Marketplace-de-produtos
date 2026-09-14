@@ -1,7 +1,9 @@
 import { MercadoPagoConfig } from "mercadopago";
 
+// Mantém uma única instância do cliente durante a vida do servidor.
 let client: MercadoPagoConfig | null = null;
 
+// Cria o cliente sob demanda apenas quando alguma ação de pagamento é solicitada.
 export function getMercadoPagoClient() {
   if (client) return client;
 
@@ -17,6 +19,7 @@ export function getMercadoPagoClient() {
   return client;
 }
 
+// URLs usadas pelo Mercado Pago para redirecionar o comprador e chamar o webhook.
 export function getFrontendUrl() {
   return process.env.FRONTEND_URL || "http://localhost:5173";
 }

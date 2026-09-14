@@ -8,6 +8,7 @@ import {
 } from "../controllers/favorite.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
+// Favoritos são particulares: todas as operações usam o usuário da sessão.
 const router = Router();
 
 router.use(requireAuth);
