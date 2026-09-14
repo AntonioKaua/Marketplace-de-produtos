@@ -14,10 +14,14 @@ import {
   ACCESS_TOKEN_MAX_AGE,
   createAccessToken,
 } from "../services/token.service.js";
+<<<<<<< HEAD
 import {
   validateProfileUpdateInput,
   validateRegistrationInput,
 } from "../utils/user-validation.js";
+=======
+import { validateRegistrationInput } from "../utils/user-validation.js";
+>>>>>>> main
 
 // Garante que campos obrigatórios recebidos da requisição são textos não vazios.
 function isNonEmptyString(value: unknown): value is string {
@@ -49,7 +53,10 @@ export async function registerUser(req: Request, res: Response) {
       });
     }
 
+<<<<<<< HEAD
     // Evita duplicidade de identificadores antes de inserir no banco.
+=======
+>>>>>>> main
     const existingUser = await findUserByEmail(data.email);
 
     if (existingUser) {
@@ -74,7 +81,10 @@ export async function registerUser(req: Request, res: Response) {
       });
     }
 
+<<<<<<< HEAD
     // Nunca salva senha pura: bcrypt produz o hash que será comparado no login.
+=======
+>>>>>>> main
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user = await createUser({
