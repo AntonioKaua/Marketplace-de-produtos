@@ -1,10 +1,8 @@
-<<<<<<< HEAD
 import { Navigate, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
-=======
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import {
@@ -22,7 +20,6 @@ import {
   onlyDigits,
   validateRegistrationForm,
 } from "./utils/userValidation";
->>>>>>> main
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -48,12 +45,11 @@ import SellerProducts from "./pages/seller/Products";
 import ProductForm from "./pages/seller/ProductForm";
 import SellerOrders from "./pages/seller/Orders";
 
-<<<<<<< HEAD
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminUsers from "./pages/admin/Users";
 import AdminProducts from "./pages/admin/Products";
 import AdminCategories from "./pages/admin/Categories";
-=======
+
   const search = e => {
     e.preventDefault();
     navigate(`/search?q=${encodeURIComponent(q)}`);
@@ -125,7 +121,7 @@ import AdminCategories from "./pages/admin/Categories";
       </div>
     </header>
   );
-}
+
 
 function Footer() {
   return <footer className="mt-20 border-t bg-white">
@@ -315,7 +311,6 @@ function Account({user}) { return <main className="container-dts py-10"><h1 clas
 function Seller() { return <main className="container-dts py-10"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="font-semibold text-dts-600">Área do vendedor</p><h1 className="text-3xl font-black">Vender na DTS</h1></div><Link to="/seller/products/new" className="btn-primary">+ Novo produto</Link></div><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[["Vendas","R$ 28.900,00"],["Pedidos","187"],["Produtos","32"],["A receber","R$ 6.420,00"]].map(([a,b])=><div className="card p-5" key={a}><p className="text-sm text-slate-500">{a}</p><p className="mt-2 text-2xl font-black">{b}</p></div>)}</div><div className="mt-8 grid gap-6 lg:grid-cols-2"><div className="card p-6"><h2 className="font-black">Acesso rápido</h2><div className="mt-4 grid gap-3"><Link className="btn-secondary justify-start" to="/seller/products"><Store size={18}/> Meus produtos</Link><Link className="btn-secondary justify-start" to="/seller/orders"><Package size={18}/> Pedidos</Link><Link className="btn-secondary justify-start" to="/seller/financial"><CreditCard size={18}/> Financeiro</Link></div></div><div className="card p-6"><h2 className="font-black">Últimas vendas</h2><div className="mt-4 space-y-3">{["#DTS-00123"," #DTS-00122"," #DTS-00121"].map((x,i)=><div key={x} className="flex justify-between border-b pb-3 text-sm"><span>{x}</span><b>{money([249.9,899.9,1599.9][i])}</b></div>)}</div></div></div></main>; }
 
 function Placeholder({title}) { return <main className="container-dts py-16"><div className="card p-10 text-center"><LayoutDashboard className="mx-auto text-dts-600" size={42}/><h1 className="mt-5 text-2xl font-black">{title}</h1><p className="mx-auto mt-2 max-w-lg text-slate-500">Tela estruturada e pronta para receber os dados da API DTS.</p></div></main>; }
->>>>>>> main
 
 export default function App() {
   const { authLoading } = useAuth();
