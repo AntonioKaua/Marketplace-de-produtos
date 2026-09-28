@@ -481,10 +481,10 @@ backend/
 
 ## 🛡️ Administração
 
-- [ ] Painel administrativo
-- [ ] Gerenciar usuários
-- [ ] Gerenciar anúncios
-- [ ] Gerenciar categorias
+- [x] Painel administrativo
+- [x] Gerenciar usuários
+- [x] Gerenciar anúncios
+- [x] Gerenciar categorias
 - [ ] Moderar conteúdo
 
 ---
