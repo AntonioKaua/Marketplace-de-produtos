@@ -526,10 +526,10 @@ POST   /messages
 
 | Integrante | Responsabilidade |
 |---|---|
-| Nome | Frontend |
-| Nome | Backend |
-| Nome | Banco de Dados |
-| Nome | Documentação |
+| Matheu Araújo | Frontend |
+| Antônio Kauã | Backend |
+| Filipe Mateus | Banco de Dados |
+| Francisco Lucas | Documentação |
 
 ---
 
