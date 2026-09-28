@@ -21,9 +21,9 @@ export function getMercadoPagoClient() {
 
 // URLs usadas pelo Mercado Pago para redirecionar o comprador e chamar o webhook.
 export function getFrontendUrl() {
-  return process.env.FRONTEND_URL || "frontend-git-dev-projetodts085-5384.vercel.app";
+  return process.env.FRONTEND_URL || "digital-trading-selling.vercel.app";
 }
 
 export function getBackendUrl() {
-  return process.env.BACKEND_URL || "marketplace-de-produtos-git-dev-projetodts085-5384.vercel.app";
+  return process.env.BACKEND_URL || "marketplace-de-produtos-nu.vercel.app";
 }
