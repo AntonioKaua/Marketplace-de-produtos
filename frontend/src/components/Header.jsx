@@ -1,15 +1,23 @@
-import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, Menu, X, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { listCategoriesRequest } from "../services/categories";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const { count, clear } = useCart();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    listCategoriesRequest()
+      .then(response => setCategories(response.categories.filter(category => !category.parentId)))
+      .catch(error => console.error("Erro ao carregar categorias:", error));
+  }, []);
 
   const search = e => {
     e.preventDefault();
@@ -92,51 +100,13 @@ export default function Header() {
         </div>
       )}
 
-      <div className="border-t border-slate-100 bg-white">
-        <nav
-          className="container-dts overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          aria-label="Categorias principais"
-        >
-          <div className="flex min-w-max items-center justify-center gap-2 sm:gap-3 md:gap-4">
-            {[
-              ["Eletrônicos", "/categories/eletronicos"],
-              ["Informática", "/categories/informatica"],
-              ["Casa", "/categories/casa"],
-              ["Moda", "/categories/moda"],
-            ].map(([label, to]) => (
-              <NavLink
-                key={label}
-                to={to}
-                className={({ isActive }) =>
-                  `group inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 ease-out focus:outline-none focus:ring-4 focus:ring-dts-100 sm:px-6 sm:text-[15px] ${
-                    isActive
-                      ? "bg-dts-600 text-white shadow-md"
-                      : "text-slate-600 hover:scale-105 hover:bg-dts-50 hover:text-dts-700 hover:shadow-md active:scale-100"
-                  }`
-                }
-              >
-                <span className="transition-transform duration-200 group-hover:scale-105">
-                  {label}
-                </span>
-              </NavLink>
-            ))}
-
-            <NavLink
-              to="/search?q=ofertas"
-              className={({ isActive }) =>
-                `group inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ease-out focus:outline-none focus:ring-4 focus:ring-dts-100 sm:px-6 sm:text-[15px] ${
-                  isActive
-                    ? "bg-dts-600 text-white shadow-md"
-                    : "text-dts-600 hover:scale-105 hover:bg-dts-600 hover:text-white hover:shadow-md active:scale-100"
-                }`
-              }
-            >
-              <span className="transition-transform duration-200 group-hover:scale-105">
-                Ofertas
-              </span>
-            </NavLink>
-          </div>
-        </nav>
+      <div className="hidden border-t border-slate-100 md:block">
+        <div className="container-dts flex h-11 items-center gap-7 text-sm font-medium text-slate-600">
+          {categories.map(category => (
+            <Link key={category.id} to={`/categories/${category.id}`} className="hover:text-dts-600">{category.name}</Link>
+          ))}
+          <Link to="/search" className="font-bold text-dts-600">Ver todos</Link>
+        </div>
       </div>
     </header>
   );
