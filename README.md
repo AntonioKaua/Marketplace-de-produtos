@@ -569,11 +569,11 @@ O projeto busca aplicar conhecimentos de:
 - [x] Implementar categorias
 - [x] Implementar busca
 - [x] Implementar filtros
-- [ ] Implementar localização
+- [X] Implementar localização
 - [x] Implementar favoritos
 - [x] Implementar chat
 - [x] Implementar avaliações
-- [ ] Implementar painel administrativo
+- [X] Implementar painel administrativo
 - [x] Implementar de chatbot
 - [ ] Realizar testes
 - [ ] Finalizar documentação
