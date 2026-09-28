@@ -477,6 +477,7 @@ backend/
 - [x] Chat entre usuários
 - [x] Avaliar vendedor
 - [x] Avaliar produto
+- [x] Implementar chatbot
 
 ## 🛡️ Administração
 
@@ -573,6 +574,7 @@ O projeto busca aplicar conhecimentos de:
 - [x] Implementar chat
 - [x] Implementar avaliações
 - [ ] Implementar painel administrativo
+- [x] Implementar de chatbot
 - [ ] Realizar testes
 - [ ] Finalizar documentação
 
