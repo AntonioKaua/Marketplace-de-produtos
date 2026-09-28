@@ -460,7 +460,7 @@ backend/
 - [x] Adicionar fotos
 - [x] Definir preço
 - [x] Adicionar descrição
-- [ ] Selecionar categoria
+- [x] Selecionar categoria
 - [ ] Informar localização
 
 ## 🔎 Busca
@@ -527,7 +527,7 @@ POST   /messages
 
 | Integrante | Responsabilidade |
 |---|---|
-| Matheu Araújo | Frontend |
+| Matheus Araújo | Frontend |
 | Antônio Kauã | Backend |
 | Filipe Mateus | Banco de Dados |
 | Francisco Lucas | Documentação |
