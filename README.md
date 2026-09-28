@@ -10,7 +10,7 @@ O projeto tem como objetivo desenvolver uma plataforma web na qual usuários pos
 
 ## 📌 Status
 
-🚧 **Em desenvolvimento**
+🚧 ***Em desenvolvimento***
 
 O projeto encontra-se em fase inicial de desenvolvimento.
 
