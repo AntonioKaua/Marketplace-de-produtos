@@ -445,38 +445,38 @@ backend/
 
 ## 👤 Usuários
 
-- [ ] Cadastro
-- [ ] Login
-- [ ] Autenticação
-- [ ] Perfil do usuário
-- [ ] Perfil do vendedor
+- [x] Cadastro
+- [x] Login
+- [x] Autenticação
+- [x] Perfil do usuário
+- [x] Perfil do vendedor
 
 ## 🏷️ Produtos
 
-- [ ] Criar anúncio
-- [ ] Editar anúncio
-- [ ] Excluir anúncio
-- [ ] Visualizar anúncio
-- [ ] Adicionar fotos
-- [ ] Definir preço
-- [ ] Adicionar descrição
+- [x] Criar anúncio
+- [x] Editar anúncio
+- [x] Excluir anúncio
+- [x] Visualizar anúncio
+- [x] Adicionar fotos
+- [x] Definir preço
+- [x] Adicionar descrição
 - [ ] Selecionar categoria
 - [ ] Informar localização
 
 ## 🔎 Busca
 
-- [ ] Buscar produtos
-- [ ] Filtrar por categoria
-- [ ] Filtrar por preço
-- [ ] Filtrar por localização
+- [x] Buscar produtos
+- [x] Filtrar por categoria
+- [x] Filtrar por preço
+- [x] Filtrar por localização
 - [ ] Ordenar resultados
 
 ## ❤️ Interações
 
-- [ ] Favoritar produtos
-- [ ] Chat entre usuários
-- [ ] Avaliar vendedor
-- [ ] Avaliar produto
+- [x] Favoritar produtos
+- [x] Chat entre usuários
+- [x] Avaliar vendedor
+- [x] Avaliar produto
 
 ## 🛡️ Administração
 
@@ -559,19 +559,19 @@ O projeto busca aplicar conhecimentos de:
 - [x] Configurar Backend
 - [x] Configurar TypeScript
 - [x] Configurar Express
-- [ ] Configurar Frontend
-- [ ] Configurar PostgreSQL
-- [ ] Modelar banco de dados
-- [ ] Implementar usuários
-- [ ] Implementar autenticação
-- [ ] Implementar CRUD de produtos
-- [ ] Implementar categorias
-- [ ] Implementar busca
-- [ ] Implementar filtros
+- [x] Configurar Frontend
+- [x] Configurar PostgreSQL
+- [x] Modelar banco de dados
+- [x] Implementar usuários
+- [x] Implementar autenticação
+- [x] Implementar CRUD de produtos
+- [x] Implementar categorias
+- [x] Implementar busca
+- [x] Implementar filtros
 - [ ] Implementar localização
-- [ ] Implementar favoritos
-- [ ] Implementar chat
-- [ ] Implementar avaliações
+- [x] Implementar favoritos
+- [x] Implementar chat
+- [x] Implementar avaliações
 - [ ] Implementar painel administrativo
 - [ ] Realizar testes
 - [ ] Finalizar documentação
