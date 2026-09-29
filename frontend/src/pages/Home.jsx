@@ -89,7 +89,7 @@ export default function Home() {
         ) : products.length === 0 ? (
           <p className="mt-8 text-slate-500">Nenhum produto anunciado ainda. Seja o primeiro a vender!</p>
         ) : (
-          <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {products.map(product => <ProductCard key={product.id} product={product} />)}
           </div>
         )}

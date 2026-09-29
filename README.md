@@ -10,7 +10,7 @@ O projeto tem como objetivo desenvolver uma plataforma web na qual usuários pos
 
 ## 📌 Status
 
-🚧 **Em desenvolvimento**
+🚧 ***Em desenvolvimento***
 
 O projeto encontra-se em fase inicial de desenvolvimento.
 
@@ -460,7 +460,7 @@ backend/
 - [x] Adicionar fotos
 - [x] Definir preço
 - [x] Adicionar descrição
-- [ ] Selecionar categoria
+- [x] Selecionar categoria
 - [ ] Informar localização
 
 ## 🔎 Busca
@@ -477,13 +477,14 @@ backend/
 - [x] Chat entre usuários
 - [x] Avaliar vendedor
 - [x] Avaliar produto
+- [x] Implementar chatbot
 
 ## 🛡️ Administração
 
-- [ ] Painel administrativo
-- [ ] Gerenciar usuários
-- [ ] Gerenciar anúncios
-- [ ] Gerenciar categorias
+- [x] Painel administrativo
+- [x] Gerenciar usuários
+- [x] Gerenciar anúncios
+- [x] Gerenciar categorias
 - [ ] Moderar conteúdo
 
 ---
@@ -526,7 +527,7 @@ POST   /messages
 
 | Integrante | Responsabilidade |
 |---|---|
-| Matheu Araújo | Frontend |
+| Matheus Araújo | Frontend |
 | Antônio Kauã | Backend |
 | Filipe Mateus | Banco de Dados |
 | Francisco Lucas | Documentação |
@@ -568,11 +569,12 @@ O projeto busca aplicar conhecimentos de:
 - [x] Implementar categorias
 - [x] Implementar busca
 - [x] Implementar filtros
-- [ ] Implementar localização
+- [X] Implementar localização
 - [x] Implementar favoritos
 - [x] Implementar chat
 - [x] Implementar avaliações
-- [ ] Implementar painel administrativo
+- [X] Implementar painel administrativo
+- [x] Implementar de chatbot
 - [ ] Realizar testes
 - [ ] Finalizar documentação
 
