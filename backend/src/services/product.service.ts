@@ -1,7 +1,7 @@
 import { supabase } from "../config/supabase.js";
 
 const PRODUCT_SELECT = `
-  id_products, title, price, quantity, description, condition,
+  id_products, external_code, title, price, quantity, description, condition,
   creation_date, update_date, year, model, category_id, id_user, status,
   category:category_id ( id_category, name ),
   seller:id_user ( id_user, name ),
@@ -10,6 +10,7 @@ const PRODUCT_SELECT = `
 
 interface ProductRow {
   id_products: number;
+  external_code: string | null;
   title: string;
   price: number;
   quantity: number;
@@ -28,6 +29,7 @@ interface ProductRow {
 }
 
 export interface ProductData {
+  externalCode?: string | null;
   title: string;
   price: number;
   quantity: number;
@@ -52,6 +54,7 @@ export interface ListProductsParams {
 function mapProduct(row: ProductRow) {
   return {
     id: row.id_products,
+    externalCode: row.external_code,
     title: row.title,
     price: Number(row.price),
     quantity: row.quantity,
@@ -140,6 +143,7 @@ export async function createProduct(sellerId: number, data: ProductData) {
   const { data: product, error } = await supabase
     .from("products")
     .insert({
+      external_code: data.externalCode ?? null,
       title: data.title,
       price: data.price,
       quantity: data.quantity,
@@ -165,6 +169,7 @@ export async function updateProduct(id: number, data: Partial<ProductData> & { s
   const payload: Record<string, unknown> = { update_date: new Date().toISOString() };
 
   if (data.title !== undefined) payload.title = data.title;
+  if (data.externalCode !== undefined) payload.external_code = data.externalCode;
   if (data.price !== undefined) payload.price = data.price;
   if (data.quantity !== undefined) payload.quantity = data.quantity;
   if (data.description !== undefined) payload.description = data.description;
@@ -186,6 +191,22 @@ export async function updateProduct(id: number, data: Partial<ProductData> & { s
   }
 
   return product ? mapProduct(product as unknown as ProductRow) : null;
+}
+
+export async function findProductImportReference(externalCode: string) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id_products, id_user")
+    .eq("external_code", externalCode)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data
+    ? { id: data.id_products as number, sellerId: data.id_user as number }
+    : null;
 }
 
 export async function deleteProduct(id: number) {

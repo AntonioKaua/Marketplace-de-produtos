@@ -6,12 +6,13 @@ import { listCategoriesRequest } from "../services/categories";
 import { listProductsRequest } from "../services/products";
 
 const CATEGORY_ICONS = {
-  "Eletrônicos": "📱",
-  "Informática": "💻",
-  "Casa": "🏠",
-  "Moda": "👟",
-  "Automóveis": "🚗",
-  "Outros": "📦",
+  "eletrônicos": "📱",
+  "informática": "💻",
+  "casa": "🏠",
+  "moda": "👟",
+  "automóveis": "🚗",
+  "imóveis": "🏢",
+  "outros": "📦",
 };
 
 export default function Home() {
@@ -63,10 +64,10 @@ export default function Home() {
 
       {categories.length > 0 && (
         <section className="container-dts -mt-8 relative z-10">
-          <div className="grid grid-cols-2 gap-3 rounded-2xl border bg-white p-4 shadow-lg sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 rounded-2xl border bg-white p-4 shadow-lg sm:grid-cols-3 lg:grid-cols-7">
             {categories.map(category => (
               <Link key={category.id} to={`/categories/${category.id}`} className="flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-50">
-                <span className="text-3xl">{CATEGORY_ICONS[category.name] ?? "🏷️"}</span>
+                <span className="text-3xl">{CATEGORY_ICONS[category.name.toLocaleLowerCase("pt-BR")] ?? "🏷️"}</span>
                 <span className="text-sm font-semibold">{category.name}</span>
               </Link>
             ))}

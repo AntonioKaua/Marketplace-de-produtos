@@ -37,6 +37,8 @@ export async function uploadProductImage(
     .single();
 
   if (error) {
+    // Evita deixar um arquivo órfão quando o registro da imagem falha.
+    await supabase.storage.from(BUCKET).remove([path]);
     throw new Error(error.message);
   }
 

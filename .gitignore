@@ -3,6 +3,9 @@
 # ==========================================
 
 node_modules/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
 
 # ==========================================
 # Variaveis de ambiente e credenciais
@@ -13,6 +16,8 @@ node_modules/
 .env.*
 **/.env
 **/.env.*
+*.env
+*.env.*
 !.env.example
 !.env.*.example
 !**/.env.example
@@ -20,8 +25,21 @@ node_modules/
 
 .npmrc
 .yarnrc
+.pypirc
+.netrc
+.envrc
+.direnv/
+*.local
+*.secret
+*.secrets
+*.credentials
 *.credentials.json
+credentials*.json
+secrets*.json
 service-account*.json
+serviceAccount*.json
+firebase-adminsdk*.json
+*-firebase-adminsdk-*.json
 credentials/
 secrets/
 
@@ -32,6 +50,10 @@ secrets/
 *.pfx
 *.jks
 *.keystore
+*.ppk
+*.kdbx
+id_rsa*
+id_ed25519*
 
 # ==========================================
 # Bancos locais, backups e dados gerados
@@ -47,9 +69,19 @@ secrets/
 backups/
 dumps/
 .supabase/
+.vercel/
+.firebase/
+.serverless/
+.sst/
+.wrangler/
 
 # Arquivos enviados por usuarios
 uploads/
+
+# Arquivos locais usados em importacoes de dados
+**/imports/
+**/src/scripts/import-*.ts
+backend/sql/20260929_add_product_external_code.sql
 
 # ==========================================
 # Build, cache, testes e logs
@@ -78,6 +110,7 @@ Thumbs.db
 Desktop.ini
 
 .idea/
+.history/
 .vscode/*.local.json
 *.swp
 *.swo

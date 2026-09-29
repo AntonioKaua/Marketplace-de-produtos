@@ -25,7 +25,9 @@ export default function Footer() {
         </div>
         <div>
           <h3 className="font-bold">Atendimento</h3>
-          <p className="mt-3 text-sm text-slate-500">Central de ajuda e suporte DTS.</p>
+          <div className="mt-3 space-y-2 text-sm text-slate-500">
+            <a className="block hover:text-dts-600" href="mailto:projeto.dts085@gmail.com">Central de ajuda e suporte DTS.</a>
+          </div>
         </div>
       </div>
       <div className="border-t py-5 text-center text-xs text-slate-400">© {new Date().getFullYear()} DTS — Digital Trading & Selling.</div>
