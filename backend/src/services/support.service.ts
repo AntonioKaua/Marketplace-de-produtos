@@ -86,13 +86,13 @@ export async function getTicketById(ticketId: number) {
     const { data, error } = await supabase
         .from("support_tickets")
         .select(
-            "id_ticket, id_user, subject, category, status, created_at, updated_at",
+            "id_ticket, id_user, subject, category, status, created_at, update_at",
         )
         .eq("id_ticket", ticketId)
         .maybeSingle();
 
     if (error) {
-        throw new Error (error.message);
+        throw new Error(error.message);
     }
 
     if (!data) {
@@ -106,7 +106,7 @@ export async function getTicketById(ticketId: number) {
         category: data.category,
         status: data.status,
         createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        updatedAt: data.update_at,
     };
 }
 
