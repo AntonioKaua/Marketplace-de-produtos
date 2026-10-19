@@ -45,7 +45,7 @@ export async function createTicket(
             category: ticket.category,
             status: ticket.status,
             createdAt: ticket.created_at,
-            updateAt: ticket.update_at, 
+            updatedAt: ticket.update_at, 
         },
 
         message: {
