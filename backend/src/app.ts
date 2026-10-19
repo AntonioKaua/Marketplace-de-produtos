@@ -11,6 +11,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import sellerRoutes from "./routes/seller.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import supportRoutes from "./routes/support.routes.js";
 
 // A aplicação é exportada sem chamar listen(). Assim, ela pode ser usada tanto
 // pelo servidor local quanto pela função serverless da Vercel.
@@ -34,6 +35,7 @@ app.use("/favorites", favoriteRoutes);
 app.use("/orders", orderRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/conversations", conversationRoutes);
+app.use("/support", supportRoutes)
 app.use("/admin", adminRoutes);
 
 export default app;
