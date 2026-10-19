@@ -1,10 +1,12 @@
 import app from "./app.js";
+import supportRoutes from "./routes/support.routes.js";
 
-// Este arquivo é usado apenas no desenvolvimento local. Na Vercel, api/index.ts
-// exporta a mesma aplicação sem abrir uma porta manualmente.
 const PORT = process.env.PORT || 3000;
 
-// Inicia o servidor depois que toda a configuração e as rotas foram registradas.
+// Registra as rotas antes de iniciar o servidor
+app.use("/support", supportRoutes);
+
+// Inicia o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
