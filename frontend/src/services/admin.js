@@ -19,3 +19,30 @@ export function listAdminProductsRequest() {
 export function deleteAdminProductRequest(id) {
   return apiRequest(`/admin/products/${id}`, { method: "DELETE" });
 }
+
+
+// Lista todos os chamados recebidos pela equipe.
+export function listAdminSupportTicketsRequest() {
+  return apiRequest("/admin/support/tickets");
+}
+
+// Busca as mensagens de um chamado.
+export function getAdminSupportMessagesRequest(ticketId) {
+  return apiRequest(`/admin/support/tickets/${ticketId}/messages`);
+}
+
+// Envia uma resposta ao cliente.
+export function sendAdminSupportMessageRequest(ticketId, message) {
+  return apiRequest(`/admin/support/tickets/${ticketId}/messages`, {
+    method: "POST",
+    body: { message },
+  });
+}
+
+// Atualiza o status do atendimento.
+export function updateAdminSupportStatusRequest(ticketId, status) {
+  return apiRequest(`/admin/support/tickets/${ticketId}/status`, {
+    method: "PATCH",
+    body: { status },
+  });
+}
