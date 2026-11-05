@@ -168,3 +168,62 @@ export async function createTicketMessage(
         createdAt: data.created_at,
     };
 }
+
+
+export async function listAllTickets() {
+    const { data, error } = await supabase
+        .from("support_tickets")
+        .select(
+            "id_ticket, id_user, subject, category, status, created_at, update_at",
+        )
+        .order("update_at", { ascending: false });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return (data ?? []).map((ticket) => ({
+        id: ticket.id_ticket,
+        userId: ticket.id_user,
+        subject: ticket.subject,
+        category: ticket.category,
+        status: ticket.status,
+        createdAt: ticket.created_at,
+        updatedAt: ticket.update_at,
+    }));
+}
+
+export async function updateTicketStatus(
+    ticketId: number,
+    status: "aberto" | "em_andamento" | "resolvido",
+) {
+    const { data, error } = await supabase
+        .from("support_tickets")
+        .update({
+            status,
+            update_at: new Date().toISOString(),
+        })
+        .eq("id_ticket", ticketId)
+        .select(
+            "id_ticket, id_user, subject, category, status, created_at, update_at",
+        )
+        .maybeSingle();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return {
+        id: data.id_ticket,
+        userId: data.id_user,
+        subject: data.subject,
+        category: data.category,
+        status: data.status,
+        createdAt: data.created_at,
+        updatedAt: data.update_at,
+    };
+}
