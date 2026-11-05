@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Heart, MessageCircle, Package, User } from "lucide-react";
+import { Heart, MessageCircle, Package, User, Headset } from "lucide-react";
 
 const LINKS = [
-  { to: "/account/profile", label: "Perfil", icon: User },
-  { to: "/account/orders", label: "Meus pedidos", icon: Package },
-  { to: "/account/favorites", label: "Favoritos", icon: Heart },
-  { to: "/account/messages", label: "Mensagens", icon: MessageCircle },
+    { to: "/account/profile", label: "Perfil", icon: User },
+    { to: "/account/orders", label: "Meus pedidos", icon: Package },
+    { to: "/account/favorites", label: "Favoritos", icon: Heart },
+    { to: "/account/messages", label: "Mensagens", icon: MessageCircle },
+    { to: "/account/support", label: "Central de Atendimento", icon: Headset },
 ];
 
 export default function AccountLayout() {
