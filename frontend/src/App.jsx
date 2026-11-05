@@ -22,6 +22,7 @@ import Profile from "./pages/account/Profile";
 import Orders from "./pages/account/Orders";
 import Favorites from "./pages/account/Favorites";
 import Messages from "./pages/account/Messages";
+import Support from "./pages/account/Support";
 
 import SellerLayout from "./pages/seller/SellerLayout";
 import SellerDashboard from "./pages/seller/Dashboard";
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="orders" element={<Orders />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="messages" element={<Messages />} />
+          <Route path="support" element={<Support />} />
         </Route>
 
         <Route path="/seller" element={<RequireAuth><SellerLayout /></RequireAuth>}>
