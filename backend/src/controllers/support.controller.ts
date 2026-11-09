@@ -1,6 +1,8 @@
 
 import { Request, Response } from "express";
 
+import { sendSupportNotification } from "../services/email.service.js";
+
 import {
     createTicket,
     createTicketMessage,
@@ -55,6 +57,14 @@ export async function postTicket(req: Request, res: Response) {
             category,
             initialMessage,
         );
+
+        void sendSupportNotification({
+            ticketId: result.ticket.id,
+            subject,
+            category,
+            message: initialMessage,
+            notificationType: "new_ticket",
+        });
 
         return res.status(201).json({
             success: true,
@@ -231,6 +241,14 @@ export async function postTicketMessage(
             res.locals.auth.userId,
             content,
         );
+
+        void sendSupportNotification({
+            ticketId,
+            subject: ticket.subject,
+            category: ticket.category,
+            message: content,
+            notificationType: "new_message",
+        });
 
         return res.status(201).json({
             success: true,
