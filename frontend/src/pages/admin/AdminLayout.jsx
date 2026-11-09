@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Layers, Store, Users } from "lucide-react";
+import { Headset, Layers, Store, Users } from "lucide-react";
 
 const LINKS = [
-  { to: "/admin/users", label: "Usuários", icon: Users },
-  { to: "/admin/products", label: "Produtos", icon: Store },
-  { to: "/admin/categories", label: "Categorias", icon: Layers },
+    { to: "/admin/users", label: "Usuários", icon: Users },
+    { to: "/admin/products", label: "Produtos", icon: Store },
+    { to: "/admin/categories", label: "Categorias", icon: Layers },
+    { to: "/admin/support", label: "Atendimentos", icon: Headset },
 ];
 
 export default function AdminLayout() {
