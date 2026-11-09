@@ -40,7 +40,7 @@ export default function Home() {
           <div>
             <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold">DTS Marketplace</span>
             <h1 className="mt-6 text-4xl font-black tracking-tight sm:text-6xl">Encontre. Compre. Venda.</h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-blue-100">Uma nova experiência para comprar e vender produtos na Digital Trading & Selling.</p>
+            <p className="mt-5 max-w-xl text-lg leading-8 text-blue-100">Uma nova experiência para comprar e vender produtos na Digital Trading &amp; Selling.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/search" className="btn-primary bg-white text-dts-700 hover:bg-blue-50">Comprar agora <ArrowRight className="ml-2" size={18} /></Link>
               <Link to="/seller" className="btn-secondary border-white/30 bg-white/10 text-white hover:bg-white/20">Quero vender</Link>

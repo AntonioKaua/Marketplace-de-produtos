@@ -1,589 +1,307 @@
 # 🛒 DTS Marketplace
 
-Marketplace acadêmico para compra e venda de produtos usados.
+**DTS — Digital Trading & Selling** é um marketplace acadêmico para compra e venda de produtos, com foco em usados. A plataforma permite publicar anúncios, pesquisar produtos, conversar com vendedores, favoritar itens, registrar avaliações e realizar pedidos com pagamento pelo Mercado Pago.
 
-O projeto tem como objetivo desenvolver uma plataforma web na qual usuários possam publicar, pesquisar e negociar produtos usados, contando com recursos de busca, filtros, localização, favoritos e comunicação entre compradores e vendedores.
+> Em desenvolvimento. Os recursos descritos como implementados estão presentes no código; sua execução depende do banco e dos serviços externos configurados. Ainda há fluxos incompletos e não existe uma suíte de testes automatizados.
 
-> 🎓 Projeto desenvolvido para fins acadêmicos.
+## Stack
 
----
+| Camada | Tecnologias |
+| --- | --- |
+| Frontend | React 19, JavaScript/JSX, Vite 7, React Router 7, Tailwind CSS 3 e Lucide React |
+| Backend | Node.js, Express 5 e TypeScript 5 com modo estrito |
+| Banco de dados | PostgreSQL no Supabase, acessado por `@supabase/supabase-js` |
+| Imagens | Supabase Storage e uploads com Multer |
+| Autenticação | JWT próprio com `jose`, bcrypt e cookies HttpOnly |
+| Pagamentos | SDK do Mercado Pago, checkout externo e webhook |
+| Assistente | Chatbase com identificação assinada pelo backend |
+| Implantação | Frontend e backend configurados separadamente para Vercel |
 
-## 📌 Status
+O frontend utiliza JavaScript/JSX. TypeScript está configurado no backend. A autenticação é própria e não utiliza o Supabase Auth.
 
-🚧 ***Em desenvolvimento***
-
-O projeto encontra-se em fase inicial de desenvolvimento.
-
----
-
-# 🧰 Stack
-
-## Frontend
-
-- React.js
-- TypeScript
-- Tailwind CSS
-
-## Backend
-
-- Node.js
-- TypeScript
-- Express.js
-
-## Banco de Dados
-
-- PostgreSQL
-
-## Ferramentas
-
-- Git
-- GitHub
-- npm
-
----
-
-# 🏗️ Arquitetura
-
-O projeto é dividido em duas aplicações:
+## Arquitetura
 
 ```text
-DTS-Marketplace/
-│
-├── frontend/
-│   └── React + TypeScript + Tailwind
-│
+Navegador: React
+    |
+    | /api/* — fetch com cookies
+    v
+Proxy do Vite (local) / rewrite da Vercel (implantação)
+    |
+    v
+Express: rotas → middlewares → controladores → serviços
+    |                         |
+    v                         v
+Supabase                 Mercado Pago
+PostgreSQL + Storage     Checkout + notificações
+```
+
+O frontend também carrega o widget do Chatbase. Quando há usuário autenticado, solicita ao backend um token para identificá-lo no assistente.
+
+### Estrutura do repositório
+
+```text
+Marketplace-de-produtos/
 ├── backend/
-│   └── Node.js + Express + TypeScript
-│
+│   ├── api/index.ts          # Entrada serverless da Vercel
+│   ├── src/
+│   │   ├── config/          # Clientes Supabase e Mercado Pago
+│   │   ├── controllers/     # Validação HTTP e respostas
+│   │   ├── middlewares/     # Autenticação e autorização
+│   │   ├── routes/          # Rotas da API
+│   │   ├── services/        # Regras de negócio e persistência
+│   │   ├── utils/           # Validação de dados de usuário
+│   │   ├── app.ts           # Aplicação Express compartilhada
+│   │   └── server.ts        # Servidor local
+│   ├── .env.example
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── vercel.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # Componentes reutilizáveis
+│   │   ├── context/         # Sessão e carrinho
+│   │   ├── pages/           # Páginas públicas, conta, vendedor e admin
+│   │   ├── services/        # Cliente HTTP e chamadas à API
+│   │   ├── utils/           # Validação e formatação monetária
+│   │   ├── App.jsx          # Rotas da interface
+│   │   ├── main.jsx         # Inicialização e providers
+│   │   └── index.css
+│   ├── package.json
+│   ├── vite.config.js
+│   └── vercel.json
 ├── .gitignore
 └── README.md
 ```
 
-O frontend e o backend funcionam separadamente e se comunicam através de uma **API REST**.
+## Funcionalidades implementadas
 
-```text
-┌──────────────────────────┐
-│        FRONTEND          │
-│                          │
-│ React + TypeScript       │
-│ Tailwind CSS             │
-└────────────┬─────────────┘
-             │
-             │ HTTP / REST
-             ▼
-┌──────────────────────────┐
-│         BACKEND          │
-│                          │
-│ Node.js + Express        │
-│ TypeScript               │
-└────────────┬─────────────┘
-             │
-             │ SQL
-             ▼
-┌──────────────────────────┐
-│       PostgreSQL         │
-│                          │
-│    Banco Relacional      │
-└──────────────────────────┘
-```
+| Área | Recursos presentes |
+| --- | --- |
+| Usuários | Cadastro com validação de CPF, telefone e e-mail; login; logout; consulta da sessão; edição de nome e telefone |
+| Produtos | Criação, edição, exclusão, detalhes, categoria, preço, quantidade, descrição, condição novo/usado, ano e modelo opcionais |
+| Imagens | Upload e exclusão, com limite de oito imagens por anúncio e 5 MB por arquivo na API |
+| Catálogo | Busca por título/descrição, filtros por categoria e preço e ordenação fixa por anúncios mais recentes |
+| Vendedores | Perfil público, anúncios, painel com indicadores e consulta de vendas |
+| Carrinho | Quantidades e persistência em `localStorage`, separada por usuário |
+| Pedidos | Endereço de entrega, criação, histórico de compras e vendas e nova tentativa de checkout para pedidos pendentes |
+| Pagamentos | Link do Mercado Pago, webhook e consulta do estado do pagamento |
+| Interações | Favoritos, avaliações de produtos e vendedores e conversas vinculadas opcionalmente a um produto |
+| Chat | Mensagens entre participantes, consultadas pela interface a cada três segundos |
+| Suporte | Abertura de chamados, histórico e mensagens; endpoints administrativos de resposta e alteração de status |
+| Administração | Gestão de usuários e papéis, exclusão de anúncios e gestão de categorias |
+| Assistente | Widget Chatbase com identificação do usuário autenticado |
 
----
+### Acesso e sessão
 
-# 💻 Pré-requisitos
+- Os papéis tratados pela aplicação são `user` e `admin`. Qualquer usuário autenticado pode anunciar e vender.
+- O JWT expira em uma hora e é enviado pelo cookie `dts_access_token`, com `HttpOnly`, `SameSite=Lax` e `Secure` quando `NODE_ENV=production`.
+- Alterações em anúncios exigem propriedade do anúncio ou acesso administrativo. Conversas e chamados têm verificações de participação/propriedade.
+- O backend recalcula os valores dos itens a partir do banco ao criar um pedido.
 
-Antes de começar, instale:
+## Executar localmente
 
-- Node.js
-- npm
-- Git
-- PostgreSQL
+### Pré-requisitos
 
-Verifique se estão instalados:
+- Node.js **22.12 ou superior**, atendendo aos requisitos registrados nos lockfiles do Vite e do cliente Supabase.
+- npm e Git.
+- Projeto Supabase com a estrutura de banco esperada e o bucket de imagens configurados.
+- Credenciais do Mercado Pago para testar pedidos com checkout.
+- Configuração do Chatbase para identificar usuários no assistente.
+
+Não é necessário instalar PostgreSQL local para usar um projeto Supabase remoto. As antigas variáveis `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD` não são utilizadas pela aplicação atual.
+
+Verifique as ferramentas:
 
 ```bash
 node --version
 npm --version
 git --version
-psql --version
 ```
 
----
+### Backend
 
-# 📥 Configuração para colaboradores
-
-## 1. Clone o repositório
-
-Escolha uma pasta onde deseja armazenar o projeto e execute:
-
-```bash
-git clone URL_DO_REPOSITORIO
-```
-
-Entre na pasta:
-
-```bash
-cd DTS-Marketplace
-```
-
----
-
-# ⚙️ Configuração do Backend
-
-Entre na pasta:
+A partir da raiz do repositório:
 
 ```bash
 cd backend
+npm ci
 ```
 
-Instale as dependências:
+Copie `backend/.env.example` para `backend/.env` e preencha as configurações. No PowerShell, dentro de `backend`:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+| Variável | Uso |
+| --- | --- |
+| `PORT` | Porta local do backend; padrão `3000` |
+| `SUPABASE_URL` | URL do projeto Supabase; obrigatória para iniciar a API |
+| `SUPABASE_SECRET_KEY` | Chave secreta de serviço do Supabase; obrigatória e exclusiva do backend |
+| `JWT_SECRET` | Segredo de assinatura da sessão com pelo menos 32 caracteres; necessário para autenticação |
+| `FRONTEND_URL` | URL usada nos retornos do checkout; em desenvolvimento, `http://localhost:5173` |
+| `BACKEND_URL` | URL usada para o webhook; precisa ser pública para receber notificações do Mercado Pago |
+| `MP_ACCESS_TOKEN` | Credencial do Mercado Pago usada para gerar checkout e consultar pagamentos |
+| `MP_WEBHOOK_SECRET` | Segredo para validar a assinatura do webhook; o código atual dispensa essa validação quando está ausente |
+| `CHATBOT_IDENTITY_SECRET` | Segredo de identificação no Chatbase; sem ele, o endpoint de identificação retorna 503 |
+
+O exemplo também contém `SUPABASE_PUBLISHABLE_KEY` e `SUPABASE_JWKS_URL`, que não são usadas pela autenticação atual. `PRODUCT_IMPORT_IMAGE_HOSTS` está relacionado ao importador, cujo script não está versionado neste checkout.
+
+Para gerar um segredo de sessão:
 
 ```bash
-npm install
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-O `npm install` utiliza o `package.json` e o `package-lock.json` para instalar as dependências necessárias.
-
----
-
-## 🔐 Configuração das variáveis de ambiente
-
-O projeto utiliza variáveis de ambiente para armazenar configurações que não devem ser diretamente incluídas no código.
-
-Dentro da pasta `backend`, crie:
-
-```text
-.env
-```
-
-Utilize o arquivo `.env.example` como referência.
-
-Exemplo:
-
-```env
-PORT=3000
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=dts_marketplace
-DB_USER=postgres
-DB_PASSWORD=
-```
-
-> ⚠️ O arquivo `.env` não deve ser enviado para o GitHub.
-
-O `.env.example` deve ser mantido no repositório para servir como modelo para os colaboradores.
-
----
-
-# ▶️ Executando o Backend
-
-Dentro da pasta `backend`:
+Inicie o servidor:
 
 ```bash
 npm run dev
 ```
 
-O servidor será iniciado utilizando:
+A API fica disponível em [http://localhost:3000](http://localhost:3000). `GET /` retorna uma mensagem de funcionamento da API; essa rota não verifica a disponibilidade do banco ou das integrações.
 
-```text
-http://localhost:3000
-```
+### Frontend
 
-Durante o desenvolvimento, o `tsx watch` reinicia automaticamente o servidor quando os arquivos forem alterados.
-
----
-
-# 🎨 Configuração do Frontend
-
-Abra outro terminal.
-
-A partir da raiz do projeto:
+Em outro terminal, a partir da raiz do repositório:
 
 ```bash
 cd frontend
-```
-
-Instale as dependências:
-
-```bash
-npm install
-```
-
-Execute o projeto:
-
-```bash
+npm ci
 npm run dev
 ```
 
-O endereço será exibido no terminal.
+Abra [http://localhost:5173](http://localhost:5173), ou a porta informada pelo Vite. O frontend utiliza `/api` como prefixo fixo. O proxy em `frontend/vite.config.js` remove esse prefixo e encaminha as chamadas para `http://localhost:3000`.
 
-Normalmente:
+Se mudar a porta do backend, atualize também o destino do proxy. O fluxo atual não exige um arquivo `.env` do frontend. Nunca coloque chaves secretas do Supabase, JWT, Mercado Pago ou Chatbase no cliente.
 
-```text
-http://localhost:5173
-```
+### Banco de dados e imagens
 
----
+Os serviços esperam as seguintes tabelas:
 
-# 🗄️ Banco de Dados
+- `users`, `category`, `products` e `product_images`;
+- `favorites`, `product_reviews` e `seller_reviews`;
+- `orders`, `order_items` e `payments`;
+- `conversations` e `messages`;
+- `support_tickets` e `support_messages`.
 
-O projeto utiliza PostgreSQL.
+A baixa de estoque chama a função SQL `decrement_product_stock`, com os parâmetros `product_id` e `amount`. As imagens são enviadas ao bucket `product-images`, e a interface utiliza URLs públicas geradas pelo Storage.
 
-Cada colaborador deverá possuir uma instalação local do PostgreSQL para desenvolvimento.
+**O repositório ainda não inclui migrations nem o esquema SQL completo.** Criar apenas as tabelas pelos nomes não é suficiente: relações, constraints, valores padrão e a função de estoque precisam corresponder às consultas dos serviços. Solicite à equipe responsável pelo banco a estrutura compatível antes de executar os fluxos. A aplicação não provisiona esses recursos automaticamente.
 
-Banco inicialmente esperado:
+### Testar a integração de pagamentos
 
-```text
-Nome: dts_marketplace
-Porta: 5432
-Usuário: postgres
-```
+1. Configure as credenciais de teste do Mercado Pago no backend.
+2. Defina `FRONTEND_URL` para a interface utilizada no teste.
+3. Para receber webhooks durante o desenvolvimento local, exponha o backend por um túnel HTTPS e use essa URL em `BACKEND_URL`.
+4. Configure `MP_WEBHOOK_SECRET` para validar a assinatura das notificações.
+5. Crie um pedido com uma conta autenticada e produtos com estoque, conclua o checkout de teste e acompanhe a atualização do pedido.
 
-As configurações devem ser informadas no arquivo `.env`.
+Os retornos são `/checkout/success`, `/checkout/failure` e `/checkout/pending`. A tela consulta o backend a cada quatro segundos quando recebe `external_reference`; o redirecionamento por si só não confirma pagamento. O carrinho é esvaziado nessa tela quando a API informa que o pedido está pago.
 
-> A estrutura definitiva do banco será definida durante a etapa de modelagem.
+Sem `MP_ACCESS_TOKEN`, a geração do checkout falha. Como a reserva de estoque acontece antes dessa etapa, consulte as limitações abaixo antes de testar esse cenário.
 
----
+## Scripts e verificações
 
-# 🌿 Fluxo de desenvolvimento com Git
+Execute os comandos dentro da pasta indicada:
 
-Não trabalhe diretamente na branch `main`.
+| Pasta | Comando | Finalidade |
+| --- | --- | --- |
+| `backend` | `npm run dev` | Iniciar o servidor com recarga usando `tsx watch` |
+| `backend` | `npm run typecheck` | Verificar tipos sem emitir arquivos |
+| `backend` | `npm run build` | Compilar `src` para `dist` |
+| `frontend` | `npm run dev` | Iniciar o Vite com proxy para a API |
+| `frontend` | `npm run build` | Gerar a interface em `dist` |
+| `frontend` | `npm run preview` | Pré-visualizar o build da interface |
 
-Para desenvolver uma nova funcionalidade, crie uma branch:
+O preview do frontend não substitui a implantação integrada com a API; o proxy local está configurado em `server.proxy` para desenvolvimento.
+
+O `npm test` do backend é um placeholder que termina com erro. Não há script de testes no frontend nem configuração de lint ou CI versionada. O comando `npm run import:products` existe no backend, mas referencia `src/scripts/import-products.ts`, ausente do repositório e abrangido pelas regras do `.gitignore`.
+
+## API
+
+Os caminhos abaixo são relativos ao backend. Pelo frontend, acrescente `/api` — por exemplo, `/api/users/login`. As rotas privadas utilizam o cookie de sessão; não exigem um token Bearer no cliente atual.
+
+| Grupo | Rotas |
+| --- | --- |
+| Sessão e perfil | `POST /users`, `POST /users/login`, `POST /users/logout`, `GET /users/me`, `PATCH /users/me`, `GET /users/chatbot-token` |
+| Categorias | `GET /categories`, `POST /categories`, `PUT /categories/:id`, `DELETE /categories/:id` |
+| Produtos | `GET /products`, `GET /products/mine`, `GET /products/:id`, `POST /products`, `PUT /products/:id`, `DELETE /products/:id` |
+| Imagens | `POST /products/:id/images`, `DELETE /products/:id/images/:imageId` |
+| Vendedores | `GET /sellers/:id` |
+| Avaliações | `GET` e `POST /products/:id/reviews`; `GET` e `POST /sellers/:id/reviews` |
+| Favoritos | `GET /favorites`; `GET`, `POST` e `DELETE /favorites/:productId` |
+| Pedidos | `GET /orders/mine`, `GET /orders/selling`, `GET /orders/:id`, `POST /orders`, `POST /orders/:id/checkout` |
+| Pagamentos | `POST /payments/webhook`, `GET /payments/order/:orderId` |
+| Conversas | `GET` e `POST /conversations`; `GET` e `POST /conversations/:id/messages` |
+| Suporte | `GET` e `POST /support/tickets`; `GET /support/tickets/:id`; `GET` e `POST /support/tickets/:id/messages` |
+| Administração de usuários | `GET /admin/users`, `PATCH /admin/users/:id/role`, `DELETE /admin/users/:id` |
+| Administração de anúncios | `GET /admin/products`, `DELETE /admin/products/:id` |
+| Administração de suporte | `GET /admin/support/tickets`; `GET` e `POST /admin/support/tickets/:id/messages`; `PATCH /admin/support/tickets/:id/status` |
+
+A leitura do catálogo, das categorias, dos perfis de vendedores e das avaliações é pública. Alterações em categorias e todas as rotas `/admin` exigem papel administrativo. O webhook é chamado pelo Mercado Pago e usa sua própria validação de assinatura.
+
+`GET /products` aceita `q`, `categoryId`, `minPrice`, `maxPrice`, `page` e `limit`. A API usa 24 itens por padrão e permite até 60 por página. O upload utiliza `multipart/form-data` com o campo `images`.
+
+## Implantação na Vercel
+
+As configurações existentes separam a aplicação em dois projetos:
+
+- **Backend:** diretório raiz `backend`, entrada `api/index.ts` e rewrite de todas as rotas para `/api/index`. Essa entrada exporta o Express sem chamar `listen()`.
+- **Frontend:** diretório raiz `frontend`, framework Vite, build `npm run build` e saída `dist`. As rotas da interface retornam `index.html` para permitir navegação pelo React Router.
+
+O rewrite `/api/:path*` do frontend aponta atualmente para `https://marketplace-de-produtos-nu.vercel.app/:path*`. Atualize `frontend/vercel.json` se mudar o endereço da API.
+
+Configure as variáveis de ambiente no projeto do backend, com `FRONTEND_URL` e `BACKEND_URL` correspondentes aos endereços públicos. A configuração de pagamentos possui URLs de fallback no código; definir as variáveis evita redirecionar para outro ambiente. A existência desses endereços na configuração não garante que a implantação esteja online.
+
+## Limitações atuais e próximos passos
+
+- **Recuperação de senha:** a página existe, mas não envia instruções nem possui fluxo de redefinição no backend.
+- **Catálogo:** localização do anúncio, filtro por localização e seleção de ordenação não estão implementados. O endereço do checkout é apenas o endereço de entrega do pedido.
+- **Paginação:** a busca mostra os primeiros 24 resultados sem navegação entre páginas. As listagens de anúncios do vendedor e do administrador carregam até 60 itens.
+- **Suporte administrativo:** endpoints e funções de cliente existem, mas ainda falta a página administrativa correspondente.
+- **Pedidos e estoque:** falhas na criação do checkout podem deixar pedidos pendentes e estoque reservado. Não há rotina de expiração de pedidos abandonados, e a reposição de estoque precisa de tratamento atômico e recuperação de falhas.
+- **Pagamentos:** o tratamento de notificações precisa cobrir concorrência, múltiplas tentativas e alterações posteriores, como reembolso de pedido pago. O webhook atualmente retorna HTTP 200 mesmo em caso de erro no processamento.
+- **Permissões:** alterações de papel e exclusões de usuário não revogam imediatamente tokens já emitidos. Não há limitação de tentativas de login implementada na aplicação.
+- **Avaliações e conversas:** avaliações não exigem compra comprovada; a criação de conversa ainda não valida a relação entre produto e vendedor informado.
+- **Operação do marketplace:** não há fluxo implementado de repasse automático aos vendedores nem gerenciamento completo de envio e entrega.
+- **Qualidade e reprodução do ambiente:** versionar migrations e a função de estoque, implementar testes automatizados, configurar CI e manter a documentação dos módulos alinhada ao código.
+
+## Contribuição
+
+Não desenvolva diretamente na `main`. Com suas alterações locais salvas, atualize a branch principal e crie uma branch para a tarefa:
 
 ```bash
-git checkout -b feature/nome-da-funcionalidade
-```
-
-Exemplos:
-
-```bash
-git checkout -b feature/login
-git checkout -b feature/products
-git checkout -b feature/search
-```
-
-Depois de implementar a funcionalidade:
-
-```bash
-git add .
-```
-
-Crie um commit:
-
-```bash
-git commit -m "feat: adiciona cadastro de produtos"
-```
-
-Envie a branch para o GitHub:
-
-```bash
-git push -u origin feature/nome-da-funcionalidade
-```
-
-Depois, abra um **Pull Request** para a branch `main`.
-
----
-
-# 🔄 Antes de começar uma nova tarefa
-
-Sempre atualize sua cópia local do projeto:
-
-```bash
-git checkout main
+git switch main
 git pull origin main
+git switch -c docs/atualiza-documentacao
 ```
 
-Depois crie sua nova branch:
+Convenções utilizadas pela equipe:
 
-```bash
-git checkout -b feature/nome-da-funcionalidade
-```
+| Branch | Finalidade |
+| --- | --- |
+| `feature/` | Nova funcionalidade |
+| `fix/` | Correção de problema |
+| `refactor/` | Refatoração |
+| `docs/` | Documentação |
+| `test/` | Testes |
+| `chore/` | Manutenção e configuração |
 
----
+Use commits com os prefixos `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `style:` ou `chore:`. Abra um Pull Request para `main`, descrevendo o problema, a alteração e as verificações realizadas.
 
-# 📝 Convenção de branches
+Antes de abrir o PR, execute as verificações pertinentes, revise os arquivos alterados e atualize a documentação. Não versione `.env`, credenciais, chaves privadas, `node_modules`, builds ou logs; consulte o `.gitignore` para as regras completas.
 
-Utilizaremos os seguintes padrões:
-
-```text
-feature/    → nova funcionalidade
-fix/        → correção de problema
-refactor/   → alteração estrutural
-docs/       → documentação
-test/       → testes
-chore/      → manutenção/configuração
-```
-
-Exemplos:
-
-```text
-feature/user-login
-feature/product-crud
-feature/search-filter
-fix/login-validation
-docs/api-documentation
-test/product-service
-```
-
----
-
-# 📝 Convenção de commits
-
-Os commits devem utilizar uma descrição curta e objetiva.
-
-### Tipos
-
-```text
-feat:      nova funcionalidade
-fix:       correção de problema
-refactor:  alteração estrutural
-docs:      documentação
-test:      testes
-style:     formatação
-chore:     configuração/manutenção
-```
-
-### Exemplos
-
-```bash
-git commit -m "feat: adiciona cadastro de usuários"
-
-git commit -m "feat: cria endpoint de produtos"
-
-git commit -m "fix: corrige validação de preço"
-
-git commit -m "docs: atualiza instruções de instalação"
-
-git commit -m "chore: configura TypeScript"
-```
-
----
-
-# 🔀 Pull Requests
-
-Antes de abrir um Pull Request:
-
-1. Verifique se o código funciona.
-2. Verifique se não existem erros no console.
-3. Verifique se os arquivos desnecessários não estão sendo enviados.
-4. Atualize a documentação caso necessário.
-5. Faça commits organizados.
-6. Atualize sua branch com a `main`, caso necessário.
-
-O Pull Request deve explicar brevemente:
-
-- O que foi implementado?
-- Qual problema foi resolvido?
-- Como testar?
-- Existe alguma alteração importante?
-
----
-
-# 🚫 Arquivos que não devem ser enviados
-
-Nunca faça commit de:
-
-```text
-node_modules/
-.env
-dist/
-build/
-*.log
-```
-
-O `.gitignore` do projeto já está configurado para ignorar esses arquivos.
-
----
-
-# 📁 Estrutura do projeto
-
-Estrutura inicial:
-
-```text
-DTS-Marketplace/
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── ...
-│
-├── backend/
-│   ├── src/
-│   │   └── server.ts
-│   ├── package.json
-│   ├── package-lock.json
-│   └── tsconfig.json
-│
-├── .gitignore
-└── README.md
-```
-
-Conforme o backend evoluir:
-
-```text
-backend/
-│
-├── src/
-│   ├── controllers/
-│   ├── routes/
-│   ├── services/
-│   ├── models/
-│   ├── middlewares/
-│   ├── database/
-│   └── server.ts
-│
-├── package.json
-├── package-lock.json
-└── tsconfig.json
-```
-
----
-
-# 🛍️ Funcionalidades planejadas
-
-## 👤 Usuários
-
-- [x] Cadastro
-- [x] Login
-- [x] Autenticação
-- [x] Perfil do usuário
-- [x] Perfil do vendedor
-
-## 🏷️ Produtos
-
-- [x] Criar anúncio
-- [x] Editar anúncio
-- [x] Excluir anúncio
-- [x] Visualizar anúncio
-- [x] Adicionar fotos
-- [x] Definir preço
-- [x] Adicionar descrição
-- [x] Selecionar categoria
-- [ ] Informar localização
-
-## 🔎 Busca
-
-- [x] Buscar produtos
-- [x] Filtrar por categoria
-- [x] Filtrar por preço
-- [x] Filtrar por localização
-- [ ] Ordenar resultados
-
-## ❤️ Interações
-
-- [x] Favoritar produtos
-- [x] Chat entre usuários
-- [x] Avaliar vendedor
-- [x] Avaliar produto
-- [x] Implementar chatbot
-
-## 🛡️ Administração
-
-- [x] Painel administrativo
-- [x] Gerenciar usuários
-- [x] Gerenciar anúncios
-- [x] Gerenciar categorias
-- [ ] Moderar conteúdo
-
----
-
-# 🌐 API
-
-O backend disponibilizará uma API REST.
-
-Exemplos de endpoints planejados:
-
-```text
-GET    /products
-GET    /products/:id
-POST   /products
-PUT    /products/:id
-DELETE /products/:id
-
-GET    /categories
-POST   /categories
-
-POST   /users
-POST   /auth/login
-
-GET    /favorites
-POST   /favorites
-DELETE /favorites/:id
-
-GET    /conversations
-POST   /conversations
-
-GET    /messages
-POST   /messages
-```
-
-> Os endpoints ainda poderão sofrer alterações durante o desenvolvimento.
-
----
-
-# 👥 Equipe
+## Equipe
 
 | Integrante | Responsabilidade |
-|---|---|
+| --- | --- |
 | Matheus Araújo | Frontend |
 | Antônio Kauã | Backend |
 | Filipe Mateus | Banco de Dados |
 | Francisco Lucas | Documentação |
 
----
+## Objetivos acadêmicos
 
-# 🎓 Objetivos acadêmicos
-
-O projeto busca aplicar conhecimentos de:
-
-- Engenharia de Software
-- Desenvolvimento Web
-- APIs REST
-- Banco de Dados
-- Modelagem Relacional
-- Arquitetura Cliente-Servidor
-- Git e GitHub
-- Desenvolvimento Frontend
-- Desenvolvimento Backend
-- Autenticação
-- CRUD
-- Trabalho colaborativo
-
----
-
-# 📌 Roadmap
-
-- [x] Criar repositório
-- [x] Definir stack
-- [x] Configurar Backend
-- [x] Configurar TypeScript
-- [x] Configurar Express
-- [x] Configurar Frontend
-- [x] Configurar PostgreSQL
-- [x] Modelar banco de dados
-- [x] Implementar usuários
-- [x] Implementar autenticação
-- [x] Implementar CRUD de produtos
-- [x] Implementar categorias
-- [x] Implementar busca
-- [x] Implementar filtros
-- [X] Implementar localização
-- [x] Implementar favoritos
-- [x] Implementar chat
-- [x] Implementar avaliações
-- [X] Implementar painel administrativo
-- [x] Implementar de chatbot
-- [ ] Realizar testes
-- [ ] Finalizar documentação
-
----
-
-<div align="center">
-
-## 🛒 DTS Marketplace
-
-Projeto acadêmico de marketplace de produtos usados.
-
-</div>
+Aplicar conhecimentos de engenharia de software, desenvolvimento web, APIs REST, modelagem relacional, autenticação, arquitetura cliente-servidor, integrações externas e trabalho colaborativo com Git e GitHub.
