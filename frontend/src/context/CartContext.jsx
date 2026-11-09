@@ -1,5 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
+import { getProductRequest } from "../services/products";
+import { addCartItem, normalizeCart, refreshCartItem } from "../utils/cart";
 
 const CartContext = createContext(null);
 
@@ -21,7 +23,7 @@ const loadCartForUser = userId => {
     const storageKey = getStorageKey(userId);
     const rawCart = localStorage.getItem(storageKey);
 
-    return rawCart ? JSON.parse(rawCart) : [];
+    return normalizeCart(rawCart ? JSON.parse(rawCart) : []);
   } catch {
     return [];
   }
@@ -36,6 +38,41 @@ export function CartProvider({ children }) {
   // Identifica de qual usuário é o carrinho atualmente carregado.
   // Isso evita salvar o carrinho de uma conta na chave de outra.
   const [cartOwnerId, setCartOwnerId] = useState(null);
+
+  const productIds = cart.map(item => item.id).join(",");
+  useEffect(() => {
+    if (!cartOwnerId || cartOwnerId !== user?.id || !productIds) return;
+    let active = true;
+    let refreshing = false;
+    const refresh = async () => {
+      if (refreshing || document.visibilityState === "hidden") return;
+      refreshing = true;
+      const results = await Promise.all(productIds.split(",").map(async id => {
+        try {
+          const { product } = await getProductRequest(id);
+          return { id: Number(id), product };
+        } catch (error) {
+          // Uma falha de rede não deve apagar o carrinho.
+          return { id: Number(id), product: error.status === 404 ? { status: "missing", quantity: 0 } : null };
+        }
+      }));
+      refreshing = false;
+      if (!active) return;
+      setCart(current => current.map(item => {
+        const product = results.find(result => result.id === item.id)?.product;
+        if (!product) return item;
+        return product.status === "missing" ? { ...item, stock: 0 } : refreshCartItem(item, product);
+      }));
+    };
+    refresh();
+    window.addEventListener("focus", refresh);
+    const interval = setInterval(refresh, 30000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [productIds, cartOwnerId, user?.id]);
 
   useEffect(() => {
     // Espera a aplicação descobrir se existe uma sessão válida.
@@ -67,45 +104,7 @@ export function CartProvider({ children }) {
   }, [cart, cartOwnerId]);
 
   const add = (product, quantity = 1) => {
-    setCart(current => {
-      const found = current.find(item => item.id === product.id);
-
-      // Produto já existe no carrinho.
-      if (found) {
-        return current.map(item => {
-          // Produtos diferentes não mudam.
-          if (item.id !== product.id) {
-            return item;
-          }
-
-          // Não adiciona além da quantidade disponível.
-          if (item.qty + quantity > item.stock) {
-            return item;
-          }
-
-          return {
-            ...item,
-            qty: item.qty + quantity,
-          };
-        });
-      }
-
-      // Impede que um produto novo entre com quantidade acima do estoque.
-      const initialQuantity = Math.min(quantity, product.quantity);
-
-      return [
-        ...current,
-        {
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          image: product.images?.[0]?.url ?? null,
-          sellerName: product.seller?.name ?? "",
-          stock: product.quantity,
-          qty: initialQuantity,
-        },
-      ];
-    });
+    setCart(current => addCartItem(current, product, quantity));
   };
 
   const remove = id => {
@@ -115,6 +114,7 @@ export function CartProvider({ children }) {
   };
 
   const setQty = (id, quantity) => {
+    if (!Number.isSafeInteger(quantity)) return;
     setCart(current => {
       return current.map(item => {
         // Não altera produtos diferentes do que foi clicado.
@@ -144,9 +144,9 @@ export function CartProvider({ children }) {
   };
 
   // Esvazia somente o carrinho da conta atualmente carregada.
-  const clear = () => {
+  const clear = useCallback(() => {
     setCart([]);
-  };
+  }, []);
 
   const total = cart.reduce((sum, item) => {
     return sum + item.price * item.qty;

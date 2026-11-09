@@ -188,6 +188,10 @@ Os serviços esperam as seguintes tabelas:
 
 A baixa de estoque chama a função SQL `decrement_product_stock`, com os parâmetros `product_id` e `amount`. As imagens são enviadas ao bucket `product-images`, e a interface utiliza URLs públicas geradas pelo Storage.
 
+Antes de publicar as correções do carrinho, aplique `backend/migrations/20261109_cart_stock.sql` no SQL Editor do Supabase. Essa migração adiciona `restock_product` (incremento atômico) e `transition_order_status` (cancelamento e reposição numa única transação, com bloqueio contra webhooks duplicados). O backend depende dessas funções. A migração não altera pedidos existentes: cancelamentos antigos cuja reposição falhou precisam de reconciliação com o estoque real; não some automaticamente todos os itens cancelados, pois alguns já foram repostos.
+
+Validação do carrinho: `node --test --test-isolation=none frontend/src/utils/cart.test.js`. Em ambiente de homologação, confira: cancelamento de um pedido pendente devolve o estoque; repetição e concorrência do mesmo webhook não duplicam a reposição; falha na reposição mantém o pedido pendente e retorna HTTP 500 para nova tentativa; falha na criação do link cancela o pedido e libera o estoque; ao retornar à aba, o carrinho atualiza estoque e preço. Pagamentos pendentes continuam reservando estoque até a confirmação ou cancelamento informado pelo provedor.
+
 **O repositório ainda não inclui migrations nem o esquema SQL completo.** Criar apenas as tabelas pelos nomes não é suficiente: relações, constraints, valores padrão e a função de estoque precisam corresponder às consultas dos serviços. Solicite à equipe responsável pelo banco a estrutura compatível antes de executar os fluxos. A aplicação não provisiona esses recursos automaticamente.
 
 ### Testar a integração de pagamentos

@@ -243,22 +243,10 @@ export async function decrementStock(id: number, quantity: number) {
 }
 
 export async function restockProduct(id: number, quantity: number) {
-  const { data, error: fetchError } = await supabase
-    .from("products")
-    .select("quantity")
-    .eq("id_products", id)
-    .maybeSingle();
-
-  if (fetchError) {
-    throw new Error(fetchError.message);
-  }
-
-  if (!data) return;
-
-  const { error } = await supabase
-    .from("products")
-    .update({ quantity: data.quantity + quantity })
-    .eq("id_products", id);
+  const { error } = await supabase.rpc("restock_product", {
+    product_id: id,
+    amount: quantity,
+  });
 
   if (error) {
     throw new Error(error.message);

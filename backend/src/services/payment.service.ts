@@ -3,7 +3,6 @@ import { Payment, Preference } from "mercadopago";
 import { getBackendUrl, getFrontendUrl, getMercadoPagoClient } from "../config/mercadopago.js";
 import { supabase } from "../config/supabase.js";
 import { getOrderById, setOrderPreference, updateOrderStatus } from "./order.service.js";
-import { restockProduct } from "./product.service.js";
 
 interface OrderForPreference {
   id: number;
@@ -104,9 +103,6 @@ export async function processPaymentNotification(paymentId: string) {
     await updateOrderStatus(orderId, "paid");
   } else if (FAILED_STATUSES.has(status)) {
     await updateOrderStatus(orderId, "cancelled");
-    for (const item of order.items) {
-      await restockProduct(item.productId, item.quantity).catch(() => undefined);
-    }
   }
 }
 

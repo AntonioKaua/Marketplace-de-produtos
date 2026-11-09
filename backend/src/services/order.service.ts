@@ -134,8 +134,13 @@ export async function createOrder(buyerId: number, items: OrderItemInput[], ship
       creationDate: order.creation_date as string,
     };
   } catch (error) {
-    for (const item of decremented) {
-      await restockProduct(item.productId, item.quantity).catch(() => undefined);
+    const rollbacks = await Promise.allSettled(
+      decremented.map(item => restockProduct(item.productId, item.quantity)),
+    );
+    const failures = rollbacks.filter(result => result.status === "rejected");
+    if (failures.length) {
+      throw new AggregateError([error, ...failures.map(result => result.reason)],
+        "Falha ao criar pedido e devolver estoque. É necessária reconciliação.");
     }
     throw error;
   }
@@ -153,10 +158,11 @@ export async function setOrderPreference(orderId: number, preferenceId: string) 
 }
 
 export async function updateOrderStatus(orderId: number, status: string) {
-  const { error } = await supabase
-    .from("orders")
-    .update({ status, update_date: new Date().toISOString() })
-    .eq("id_orders", orderId);
+  // A transição e a devolução do estoque pertencem à mesma transação.
+  const { error } = await supabase.rpc("transition_order_status", {
+    order_id: orderId,
+    next_status: status,
+  });
 
   if (error) {
     throw new Error(error.message);

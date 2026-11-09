@@ -70,6 +70,11 @@ export default function Checkout() {
 
   const submit = async event => {
     event.preventDefault();
+    if (loading) return;
+    if (cart.some(item => item.stock < item.qty)) {
+      setError("Há produtos sem estoque suficiente. Volte ao carrinho e ajuste os itens.");
+      return;
+    }
     setError("");
 
     try {

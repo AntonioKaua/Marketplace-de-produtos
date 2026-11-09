@@ -9,6 +9,7 @@ import {
   OrderError,
   OrderItemInput,
   ShippingInput,
+  updateOrderStatus,
 } from "../services/order.service.js";
 import { createPreferenceForOrder } from "../services/payment.service.js";
 
@@ -25,8 +26,11 @@ function parseOrderInput(body: unknown) {
     }))
     .filter(item => Number.isInteger(item.productId) && Number.isInteger(item.quantity) && item.quantity > 0);
 
-  if (items.length === 0) {
-    errors.items = "Adicione ao menos um produto ao pedido.";
+  if (items.length === 0 || items.length !== rawItems.length || items.some(item => item.productId <= 0)) {
+    errors.items = "Informe produtos e quantidades válidos para todos os itens.";
+  }
+  if (new Set(items.map(item => item.productId)).size !== items.length) {
+    errors.items = "O pedido contém produtos duplicados.";
   }
 
   const shippingInput = input.shipping && typeof input.shipping === "object"
@@ -70,12 +74,17 @@ export async function postOrder(req: Request, res: Response) {
 
     // O service recalcula preço e estoque no servidor; nada é confiado ao carrinho do frontend.
     const order = await createOrder(res.locals.auth.userId, data.items, data.shipping);
-    const fullOrder = await getOrderById(order.id);
-
-    const { initPoint } = await createPreferenceForOrder(
-      { id: order.id, total: order.total, buyerId: res.locals.auth.userId, items: fullOrder!.items },
-      res.locals.auth.email,
-    );
+    let initPoint: string;
+    try {
+      const fullOrder = await getOrderById(order.id);
+      ({ initPoint } = await createPreferenceForOrder(
+        { id: order.id, total: order.total, buyerId: res.locals.auth.userId, items: fullOrder!.items },
+        res.locals.auth.email,
+      ));
+    } catch (error) {
+      await updateOrderStatus(order.id, "cancelled");
+      throw error;
+    }
 
     return res.status(201).json({ success: true, order, initPoint });
   } catch (error) {

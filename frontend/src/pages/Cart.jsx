@@ -5,6 +5,7 @@ import { money } from "../utils/money";
 
 export default function Cart() {
   const { cart, remove, setQty, total } = useCart();
+  const unavailable = cart.some(item => item.stock < item.qty);
 
   return (
     <main className="container-dts py-10">
@@ -28,10 +29,11 @@ export default function Cart() {
                 <div className="min-w-0 flex-1">
                   <Link to={`/products/${item.id}`} className="font-bold hover:text-dts-600">{item.title}</Link>
                   <p className="mt-1 text-sm text-slate-500">{item.sellerName}</p>
+                  {item.stock < item.qty && <p role="alert" className="mt-1 text-sm text-red-600">{item.stock === 0 ? "Produto indisponível no momento. Remova-o ou aguarde a liberação do estoque." : `Restam ${item.stock} unidades. Ajuste a quantidade.`}</p>}
                   <div className="mt-3 flex items-center gap-3">
-                    <button onClick={() => setQty(item.id, item.qty - 1)} className="rounded-lg border px-3 py-1">−</button>
+                    <button disabled={item.qty <= 1} onClick={() => setQty(item.id, Math.min(item.qty - 1, Math.max(1, item.stock)))} className="rounded-lg border px-3 py-1 disabled:opacity-40">−</button>
                     <span>{item.qty}</span>
-                    <button onClick={() => setQty(item.id, item.qty + 1)} className="rounded-lg border px-3 py-1">+</button>
+                    <button disabled={item.qty >= item.stock} onClick={() => setQty(item.id, item.qty + 1)} className="rounded-lg border px-3 py-1 disabled:opacity-40">+</button>
                   </div>
                 </div>
                 <div className="text-right">
@@ -46,7 +48,7 @@ export default function Cart() {
             <div className="mt-5 flex justify-between text-slate-500"><span>Subtotal</span><span>{money(total)}</span></div>
             <div className="mt-3 flex justify-between text-slate-500"><span>Frete</span><span>Combinado com o vendedor</span></div>
             <div className="my-5 border-t pt-5 flex justify-between text-xl font-black"><span>Total</span><span>{money(total)}</span></div>
-            <Link to="/checkout" className="btn-primary w-full">Continuar compra</Link>
+            {unavailable ? <p role="alert" className="text-sm text-red-600">Ajuste os itens indisponíveis antes de continuar.</p> : <Link to="/checkout" className="btn-primary w-full">Continuar compra</Link>}
           </div>
         </div>
       )}
