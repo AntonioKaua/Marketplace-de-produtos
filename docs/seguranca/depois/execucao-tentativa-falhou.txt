@@ -1,0 +1,10 @@
+RPC subprocess failed: semgrep-core exited with code 1.
+semgrep-core rule validation failed (SemgrepError)
+RPC subprocess failed: semgrep-core exited with code 1.
+semgrep-core rule validation failed (SemgrepError)
+RPC subprocess failed: semgrep-core exited with code 1.
+semgrep-core rule validation failed (SemgrepError)
+RPC subprocess failed: semgrep-core exited with code 1.
+RPC subprocess failed: semgrep-core exited with code 1.
+[ERROR] Failed to obtain target files from semgrep-core
+RPC subprocess failed: semgrep-core exited with code 1.
