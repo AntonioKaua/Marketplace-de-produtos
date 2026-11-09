@@ -34,6 +34,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminUsers from "./pages/admin/Users";
 import AdminProducts from "./pages/admin/Products";
 import AdminCategories from "./pages/admin/Categories";
+import AdminSupport from "./pages/admin/AdminSupport";
 
 export default function App() {
   const { authLoading } = useAuth();
@@ -86,6 +87,7 @@ export default function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
+          <Route path="support" element={<AdminSupport />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
