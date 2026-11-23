@@ -160,6 +160,7 @@ export function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cart,
+        cartReady: !authLoading && cartOwnerId === (user?.id ?? null),
         add,
         remove,
         setQty,
