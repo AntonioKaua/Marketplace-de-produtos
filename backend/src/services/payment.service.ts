@@ -197,7 +197,7 @@ export async function processPaymentNotification(
     return;
   }
 
-  // Pagamento recusado, cancelado ou estornado.
+   // Pagamento recusado, cancelado ou estornado.
   if (FAILED_STATUSES.has(status)) {
     await updateOrderStatus(orderId, "cancelled");
 
