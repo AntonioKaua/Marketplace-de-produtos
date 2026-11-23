@@ -96,17 +96,12 @@ export async function postWebhook(req: Request, res: Response) {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Erro ao processar webhook do Mercado Pago:", error);
-<<<<<<< Updated upstream
-    // Permite que o provedor repita uma notificação cuja transação falhou.
-    return res.status(500).json({ success: false });
-=======
 
     // Erro 500 permite que o Mercado Pago tente reenviar a notificação.
     return res.status(500).json({
       success: false,
       message: "Falha ao processar notificação.",
     });
->>>>>>> Stashed changes
   }
 }
 

@@ -7,9 +7,6 @@ import {
 } from "../config/mercadopago.js";
 
 import { supabase } from "../config/supabase.js";
-<<<<<<< Updated upstream
-import { getOrderById, setOrderPreference, updateOrderStatus } from "./order.service.js";
-=======
 
 import {
   getOrderById,
@@ -18,7 +15,6 @@ import {
 } from "./order.service.js";
 
 import { restockProduct } from "./product.service.js";
->>>>>>> Stashed changes
 
 interface OrderForPreference {
   id: number;
@@ -204,8 +200,6 @@ export async function processPaymentNotification(
   // Pagamento recusado, cancelado ou estornado.
   if (FAILED_STATUSES.has(status)) {
     await updateOrderStatus(orderId, "cancelled");
-<<<<<<< Updated upstream
-=======
 
     for (const item of order.items) {
       await restockProduct(
@@ -218,7 +212,6 @@ export async function processPaymentNotification(
         );
       });
     }
->>>>>>> Stashed changes
   }
 }
 
