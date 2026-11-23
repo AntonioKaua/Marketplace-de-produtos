@@ -21,7 +21,7 @@ const VARIANTS = {
     icon: Clock3,
     color: "text-amber-600",
     title: "Pagamento pendente",
-    description: "Recebemos seu pedido e estamos aguardando a confirmação do pagamento.",
+    description: "Recebemos seu pedido e estamos aguardando a confirmação do pagamento. Se você escolheu PIX, finalize o pagamento no app do seu banco: o pedido é atualizado automaticamente assim que o pagamento for confirmado.",
   },
 };
 

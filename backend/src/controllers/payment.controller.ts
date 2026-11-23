@@ -1,15 +1,21 @@
-import { createHmac } from "node:crypto";
+
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { Request, Response } from "express";
 
 import { getOrderById, isOrderParticipant } from "../services/order.service.js";
-import { getPaymentStatusForOrder, processPaymentNotification } from "../services/payment.service.js";
+import {
+  getPaymentStatusForOrder,
+  processPaymentNotification,
+} from "../services/payment.service.js";
 
-// Valida a assinatura HMAC enviada pelo Mercado Pago quando o segredo de webhook existe.
-function isSignatureValid(req: Request, dataId: string) {
+// Valida a assinatura HMAC enviada pelo Mercado Pago.
+function isSignatureValid(req: Request, dataId: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
 
+  // Em produção, nunca aceitar notificações sem o segredo.
   if (!secret) {
-    return true;
+    console.error("MP_WEBHOOK_SECRET não configurado.");
+    return false;
   }
 
   const signatureHeader = req.header("x-signature");
@@ -20,79 +26,135 @@ function isSignatureValid(req: Request, dataId: string) {
   }
 
   const parts = Object.fromEntries(
-    signatureHeader.split(",").map(part => {
-      const [key, value] = part.split("=");
-      return [key?.trim(), value?.trim()];
+    signatureHeader.split(",").map((part) => {
+      const [key, ...values] = part.split("=");
+      return [key?.trim(), values.join("=").trim()];
     }),
   );
 
   const ts = parts.ts;
   const v1 = parts.v1;
 
-  if (!ts || !v1) {
+  if (!ts || !v1 || !/^[a-f0-9]{64}$/i.test(v1)) {
     return false;
   }
 
   const manifest = `id:${dataId.toLowerCase()};request-id:${requestId};ts:${ts};`;
-  const expected = createHmac("sha256", secret).update(manifest).digest("hex");
 
-  return expected === v1;
+  const expected = createHmac("sha256", secret)
+    .update(manifest)
+    .digest();
+
+  const received = Buffer.from(v1, "hex");
+
+  if (received.length !== expected.length) {
+    return false;
+  }
+
+  return timingSafeEqual(expected, received);
 }
 
-// Endpoint chamado pelo Mercado Pago para sincronizar o status de um pagamento.
+// Endpoint chamado pelo Mercado Pago.
 export async function postWebhook(req: Request, res: Response) {
   try {
     const body = req.body ?? {};
-    const type = body.type ?? req.query.type ?? req.query.topic;
-    const dataId = body.data?.id ?? req.query["data.id"] ?? req.query.id;
 
-    // Outros tipos de evento não afetam pedidos e são confirmados sem processamento.
-    if (type !== "payment" || !dataId) {
+    const type = String(
+      body.type ?? req.query.type ?? req.query.topic ?? "",
+    );
+
+    // Outros eventos não relacionados a pagamentos são ignorados.
+    if (type !== "payment") {
       return res.status(200).json({ success: true });
     }
 
-    if (!isSignatureValid(req, String(dataId))) {
-      console.warn("Assinatura de webhook do Mercado Pago inválida.");
-      return res.status(401).json({ success: false });
+    const rawDataId =
+      req.query["data.id"] ??
+      body.data?.id ??
+      req.query.id;
+
+    if (!rawDataId || Array.isArray(rawDataId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Identificador do pagamento ausente ou inválido.",
+      });
     }
 
-    await processPaymentNotification(String(dataId));
+    const dataId = String(rawDataId);
+
+    if (!isSignatureValid(req, dataId)) {
+      console.warn("Assinatura do webhook do Mercado Pago inválida.");
+
+      return res.status(401).json({
+        success: false,
+        message: "Assinatura inválida.",
+      });
+    }
+
+    await processPaymentNotification(dataId);
 
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Erro ao processar webhook do Mercado Pago:", error);
+<<<<<<< Updated upstream
     // Permite que o provedor repita uma notificação cuja transação falhou.
     return res.status(500).json({ success: false });
+=======
+
+    // Erro 500 permite que o Mercado Pago tente reenviar a notificação.
+    return res.status(500).json({
+      success: false,
+      message: "Falha ao processar notificação.",
+    });
+>>>>>>> Stashed changes
   }
 }
 
-// Permite que participantes do pedido consultem o status que chegou pelo webhook.
+// Consulta o status do pagamento para participantes do pedido.
 export async function getOrderPaymentStatus(req: Request, res: Response) {
   try {
     const orderId = Number(req.params.orderId);
 
-    if (!Number.isInteger(orderId)) {
-      return res.status(400).json({ success: false, message: "Pedido inválido." });
+    if (!Number.isInteger(orderId) || orderId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Pedido inválido.",
+      });
     }
 
     const order = await getOrderById(orderId);
 
     if (!order) {
-      return res.status(404).json({ success: false, message: "Pedido não encontrado." });
+      return res.status(404).json({
+        success: false,
+        message: "Pedido não encontrado.",
+      });
     }
 
     const allowed =
-      res.locals.auth.role === "admin" || (await isOrderParticipant(order, res.locals.auth.userId));
+      res.locals.auth.role === "admin" ||
+      (await isOrderParticipant(order, res.locals.auth.userId));
 
     if (!allowed) {
-      return res.status(403).json({ success: false, message: "Você não tem acesso a este pedido." });
+      return res.status(403).json({
+        success: false,
+        message: "Você não tem acesso a este pedido.",
+      });
     }
 
     const payment = await getPaymentStatusForOrder(orderId);
 
-    return res.status(200).json({ success: true, orderStatus: order.status, payment });
+    return res.status(200).json({
+      success: true,
+      orderStatus: order.status,
+      payment,
+    });
   } catch (error) {
     console.error("Erro ao consultar status do pagamento:", error);
-    return res.status(500).json({ success: false, message: "Erro interno ao consultar status do pagamento." });
+
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno ao consultar status do pagamento.",
+    });
   }
 }
