@@ -147,10 +147,27 @@ export async function processPaymentNotification(
   const client = getMercadoPagoClient();
   const payment = new Payment(client);
 
-  const result = await payment.get({
-    id: paymentId,
-  });
+  let result;
 
+  try {
+    result = await payment.get({
+      id: paymentId,
+    });
+  } catch (error: any) {
+    if (
+      error?.status === 404 ||
+      error?.cause?.status === 404 ||
+      error?.error === "not_found"
+    ) {
+      console.warn(
+        `Pagamento ${paymentId} não encontrado no Mercado Pago.`
+      );
+
+      return;
+    }
+
+    throw error;
+  }
   const orderId = result.external_reference
     ? Number(result.external_reference)
     : null;
