@@ -9,21 +9,19 @@ import {
 } from "../services/payment.service.js";
 
 // Valida a assinatura HMAC enviada pelo Mercado Pago.
-function isSignatureValid(req: Request, dataId: string): boolean {
+function getSignatureError(req: Request, dataId: string): string | null {
   const secret = process.env.MP_WEBHOOK_SECRET;
 
   // Em produção, nunca aceitar notificações sem o segredo.
   if (!secret) {
-    console.error("MP_WEBHOOK_SECRET não configurado.");
-    return false;
+    return "secret_missing";
   }
 
   const signatureHeader = req.header("x-signature");
   const requestId = req.header("x-request-id");
 
-  if (!signatureHeader || !requestId) {
-    return false;
-  }
+  if (!signatureHeader) return "x_signature_missing";
+  if (!requestId) return "x_request_id_missing";
 
   const parts = Object.fromEntries(
     signatureHeader.split(",").map((part) => {
@@ -36,7 +34,7 @@ function isSignatureValid(req: Request, dataId: string): boolean {
   const v1 = parts.v1;
 
   if (!ts || !v1 || !/^[a-f0-9]{64}$/i.test(v1)) {
-    return false;
+    return "signature_format_invalid";
   }
 
   const manifest = `id:${dataId.toLowerCase()};request-id:${requestId};ts:${ts};`;
@@ -48,10 +46,10 @@ function isSignatureValid(req: Request, dataId: string): boolean {
   const received = Buffer.from(v1, "hex");
 
   if (received.length !== expected.length) {
-    return false;
+    return "signature_length_invalid";
   }
 
-  return timingSafeEqual(expected, received);
+  return timingSafeEqual(expected, received) ? null : "hmac_mismatch";
 }
 
 // Endpoint chamado pelo Mercado Pago.
@@ -82,8 +80,21 @@ export async function postWebhook(req: Request, res: Response) {
 
     const dataId = String(rawDataId);
 
-    if (!isSignatureValid(req, dataId)) {
-      console.warn("Assinatura do webhook do Mercado Pago inválida.");
+    const signatureError = getSignatureError(req, dataId);
+    if (signatureError) {
+      // Registra somente diagnóstico estrutural: nunca segredo, assinatura,
+      // corpo completo ou identificadores de pagamentos/clientes.
+      console.warn("Assinatura do webhook do Mercado Pago inválida.", {
+        reason: signatureError,
+        hasQueryDataId: typeof req.query["data.id"] === "string",
+        hasLegacyQueryId: typeof req.query.id === "string",
+        hasLegacyTopic: typeof req.query.topic === "string",
+        hasBodyDataId: body.data?.id != null,
+        queryBodyIdMatches:
+          req.query["data.id"] != null && body.data?.id != null
+            ? String(req.query["data.id"]) === String(body.data.id)
+            : null,
+      });
 
       return res.status(401).json({
         success: false,
