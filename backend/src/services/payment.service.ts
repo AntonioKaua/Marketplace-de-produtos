@@ -1,7 +1,6 @@
 import { Payment, Preference } from "mercadopago";
 
 import {
-  getBackendUrl,
   getFrontendUrl,
   getMercadoPagoClient,
 } from "../config/mercadopago.js";
@@ -55,7 +54,6 @@ export async function createPreferenceForOrder(
   const preference = new Preference(client);
 
   const frontendUrl = getFrontendUrl();
-  const backendUrl = getBackendUrl();
 
   // Identifica localhost e 127.0.0.1.
   const isLocalFrontendUrl =
@@ -101,7 +99,8 @@ export async function createPreferenceForOrder(
             auto_return: "approved" as const,
           }),
 
-      notification_url: `${backendUrl}/payments/webhook`,
+      // Usa os Webhooks configurados em Suas integrações para a aplicação
+      // do MP_ACCESS_TOKEN. Uma notification_url aqui sobrescreveria o painel.
 
       external_reference: String(order.id),
     },
