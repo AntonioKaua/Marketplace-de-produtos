@@ -50,6 +50,9 @@ secrets/
 *.pfx
 *.jks
 *.keystore
+keystore.properties
+*.apk
+*.aab
 *.ppk
 *.kdbx
 id_rsa*

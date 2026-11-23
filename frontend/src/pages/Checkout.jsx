@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { openCheckout } from "../services/mobile";
 import Field from "../components/Field";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -13,6 +14,7 @@ const UF_LIST = [
 ];
 
 export default function Checkout() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { cart, total } = useCart();
   const [shipping, setShipping] = useState({ cep: "", address: "", city: "", state: "" });
@@ -84,7 +86,7 @@ export default function Checkout() {
         shipping,
       });
 
-      window.location.href = response.initPoint;
+      await openCheckout(response.initPoint, response.order.id, navigate);
     } catch (requestError) {
       setErrors(requestError.errors || {});
       setError(requestError.message);

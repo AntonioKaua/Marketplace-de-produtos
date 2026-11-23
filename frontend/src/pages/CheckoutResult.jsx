@@ -53,10 +53,12 @@ export default function CheckoutResult({ variant }) {
     };
 
     poll();
+    window.addEventListener("focus", poll);
     const interval = setInterval(poll, 4000);
 
     return () => {
       active = false;
+      window.removeEventListener("focus", poll);
       clearInterval(interval);
     };
   }, [orderId, clear]);
@@ -65,8 +67,8 @@ export default function CheckoutResult({ variant }) {
     <main className="container-dts py-16">
       <div className="card mx-auto max-w-lg p-10 text-center">
         <Icon className={`mx-auto ${color}`} size={48} />
-        <h1 className="mt-5 text-2xl font-black">{title}</h1>
-        <p className="mx-auto mt-2 max-w-md text-slate-500">{description}</p>
+        <h1 className="mt-5 text-2xl font-black">{status === "paid" ? "Pagamento confirmado" : status === "cancelled" ? "Pedido cancelado" : title}</h1>
+        <p className="mx-auto mt-2 max-w-md text-slate-500">{status === "paid" ? "Seu pagamento foi confirmado. Acompanhe a compra em Meus pedidos." : status === "cancelled" ? "Este pedido foi cancelado. Você pode iniciar uma nova compra." : description}</p>
         {status && (
           <p className="mt-3 text-sm font-semibold text-slate-600">Status atual do pedido: {status}</p>
         )}

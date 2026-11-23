@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { openCheckout } from "../../services/mobile";
 import { listMyOrdersRequest, retryOrderCheckoutRequest } from "../../services/orders";
 import { money } from "../../utils/money";
 
@@ -17,6 +19,7 @@ const STATUS_COLORS = {
 };
 
 export default function Orders() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [retryingId, setRetryingId] = useState(null);
@@ -32,7 +35,7 @@ export default function Orders() {
     setRetryingId(orderId);
     try {
       const response = await retryOrderCheckoutRequest(orderId);
-      window.location.href = response.initPoint;
+      await openCheckout(response.initPoint, orderId, navigate);
     } catch (error) {
       console.error("Erro ao gerar novo link de pagamento:", error);
       setRetryingId(null);

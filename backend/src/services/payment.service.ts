@@ -14,8 +14,6 @@ import {
   updateOrderStatus,
 } from "./order.service.js";
 
-import { restockProduct } from "./product.service.js";
-
 interface OrderForPreference {
   id: number;
   total: number;
@@ -216,19 +214,9 @@ export async function processPaymentNotification(
 
    // Pagamento recusado, cancelado ou estornado.
   if (FAILED_STATUSES.has(status)) {
+    // A função SQL cancela e repõe o estoque na mesma transação.
+    // Repor novamente aqui duplicaria o estoque devolvido.
     await updateOrderStatus(orderId, "cancelled");
-
-    for (const item of order.items) {
-      await restockProduct(
-        item.productId,
-        item.quantity
-      ).catch((error) => {
-        console.error(
-          `Erro ao devolver estoque do produto ${item.productId}:`,
-          error
-        );
-      });
-    }
   }
 }
 

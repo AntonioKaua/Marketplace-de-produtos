@@ -1,0 +1,9 @@
+{
+  "appId": "com.dts.marketplace",
+  "appName": "DTS Marketplace",
+  "webDir": "dist",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "CapacitorHttp": { "enabled": true }
+  }
+}

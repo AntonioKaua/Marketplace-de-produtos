@@ -6,11 +6,14 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import "./index.css";
 import PwaControls from "./components/PwaControls";
+import { isNativeApp } from "./services/mobile";
+import NativeControls from "./components/NativeControls";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <PwaControls />
+      <NativeControls />
+      {!isNativeApp && <PwaControls />}
       <AuthProvider>
         <CartProvider>
           <App />

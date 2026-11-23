@@ -272,6 +272,58 @@ Configure as variáveis de ambiente no projeto do backend, com `FRONTEND_URL` e 
 - **Operação do marketplace:** não há fluxo implementado de repasse automático aos vendedores nem gerenciamento completo de envio e entrega.
 - **Qualidade e reprodução do ambiente:** versionar migrations e a função de estoque, implementar testes automatizados, configurar CI e manter a documentação dos módulos alinhada ao código.
 
+## Aplicativo Android / Amazon Appstore
+
+O projeto Android está em `frontend/android`, usa Capacitor 8 e inclui o build React
+no APK. Identificador: `com.dts.marketplace`; versão inicial: `1.0` (código 1).
+O mínimo é Android API 24; confira os Fire Tablets compatíveis na loja.
+O aplicativo não foi adaptado para controle remoto de Fire TV.
+
+No app, a API é `https://digital-trading-selling.vercel.app/api`, acessada pelo
+transporte HTTP nativo do Capacitor, inclusive cookies de sessão e multipart de
+imagens. Na web, o prefixo continua `/api`. O backend permanece na Vercel.
+Não foi necessário liberar CORS nem expor o JWT ao JavaScript.
+
+O pagamento abre no navegador padrão. Ao voltar ao app pelo botão Voltar, a tela
+consulta o pedido na API; a confirmação depende do webhook. O navegador tem uma
+sessão separada e pode solicitar login no retorno web. O app não registra service
+worker nem mostra instruções de instalação PWA.
+
+Pré-requisitos: Node compatível com as dependências, JDK 21, Android Studio
+2025.2.1 ou superior e SDK Android 36. Configure o SDK no Android Studio ou em
+`frontend/android/local.properties` (ignorado pelo Git).
+
+No PowerShell, dentro de `frontend`:
+
+```powershell
+npm ci
+npm run android:sync
+npm run android:open
+```
+
+Compile com `npm run android:debug` ou `npm run android:release` (Windows).
+A release usa `android/keystore.properties`, conforme `keystore.properties.example`.
+O APK assinado fica em `frontend/android/app/build/outputs/apk/release/app-release.apk`.
+Também é possível usar **Build > Generate Signed App Bundle or APK > APK** no Android Studio.
+
+Faça backup seguro de `frontend/android/dts-release.keystore` e
+`frontend/android/keystore.properties`. Esses arquivos são locais e ignorados pelo
+Git; nunca publique suas senhas. Atualizações devem manter a assinatura e aumentar
+`versionCode`/`versionName` em `android/app/build.gradle`. Após alterar o frontend,
+execute `android:sync` novamente.
+
+Antes de enviar à Amazon, teste em Fire Tablet: cadastro/login, sessão ao reabrir,
+logout, upload de imagens, botão Voltar, compra, nova tentativa de pagamento,
+retorno do navegador, confirmação pelo webhook e comportamento sem internet.
+Build e testes unitários não substituem testes em aparelho. Complete a ficha da
+loja, privacidade, classificação e credenciais de revisão quando solicitadas.
+
+Teste do cliente HTTP e carrinho, a partir da raiz:
+
+```powershell
+node --test --test-isolation=none frontend/src/services/api.test.js frontend/src/utils/cart.test.js
+```
+
 ## Contribuição
 
 Não desenvolva diretamente na `main`. Com suas alterações locais salvas, atualize a branch principal e crie uma branch para a tarefa:

@@ -1,4 +1,8 @@
-const API_PREFIX = "/api";
+import { Capacitor } from "@capacitor/core";
+
+const API_PREFIX = Capacitor.isNativePlatform()
+  ? "https://digital-trading-selling.vercel.app/api"
+  : "/api";
 
 export class ApiError extends Error {
   constructor(message, status, errors = {}) {
